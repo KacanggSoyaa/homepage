@@ -10,15 +10,5 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 2000);
     });
     
-    document.getElementById('commentForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const name = document.getElementById('name').value.trim();
-      const comment = document.getElementById('comment').value.trim();
-      if (name && comment) {
-        const commentDiv = document.createElement('div');
-        commentDiv.innerHTML = `<strong>${name}:</strong> ${comment}`;
-        document.getElementById('comments').appendChild(commentDiv);
-        this.reset();
-      }
-    });
+    
 });
