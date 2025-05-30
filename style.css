@@ -138,15 +138,6 @@ section.RightContainer {
     text-decoration: underline;
   }
 
-  p.Explanation {
-    font-size: 17px;
-    color: var(--text-color);
-    padding: 3px;
-    font-family: Arial, sans-serif;
-    float: left;
-    line-height: 1.6;
-  }
-
   ul.List {
     padding: 1.5rem;
     padding-top: 0;
@@ -174,6 +165,6 @@ footer {
   text-align: center;
   padding: 2px;
   background: #35424a;
-  color: #c266a7;
+  color: var(--text-color);
   position: fixed;
 }
