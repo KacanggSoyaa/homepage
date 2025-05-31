@@ -102,15 +102,6 @@ section.certificates {
     font-family: Arial, sans-serif;
     line-height: 1.6;
   }
-
-  li.cert-list {
-    color: var(--text-color);
-    float: left;
-    margin-right: 10px;
-    padding: 3px;
-    font-family: Arial, sans-serif;
-    line-height: 1.6;
-  }
 }
 
 section.certificates:hover {

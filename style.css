@@ -158,6 +158,56 @@ section.RightContainer:hover {
   transition: opacity 0.3s ease-in-out;
 }
 
+section.Favshow {
+  background: #041421;
+  padding: 1rem;
+  border-radius: 25px;
+  box-shadow: 0 2px 5px #86b9b0;
+  margin: 10px 0 200px;
+  width: 77%;
+  height: 495px;
+  display: flex;
+  justify-content: flex-start;
+  gap: 10px;
+  opacity: 0.9;
+  position: absolute;
+  top: 100%;
+  margin-bottom: 40px;
+  text-align: center;
+  transition: opacity 0.3s ease-in-out;
+
+  p.Textshow {
+    color: var(--text-color);
+    float: center;
+    margin-right: 10px;
+    padding: 3px;
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    font-size: 23px;
+    font-weight: bold;
+    text-decoration: underline;
+  }
+}
+
+section.Favshow:hover {
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
+}
+
+section.Favshow img {
+  width: 10%;
+  height: 450px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 2px solid rgb(255, 255, 255, 0.684);
+  transition: all ease-in-out 0.5s;
+  margin-bottom: 40px;
+}
+
+section.Favshow img:hover {
+  width: 25%;
+}
+
 footer {
   bottom: 0;
   left: 0;
