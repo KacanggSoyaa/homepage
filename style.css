@@ -59,14 +59,20 @@ body {
 /* Section Styling */
 main {
   display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  align-items: start;
-  gap: 2rem;
+  flex-direction: column;
+  gap: 1rem;
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
   padding-bottom: 100px;
+}
+
+.TopRow {
+  /*To sperate the left and right container with Favshow container */
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+  width: 100%;
 }
 
 section.LeftContainer {
@@ -83,6 +89,16 @@ section.LeftContainer {
   opacity: 0.9;
   transition: opacity 0.3s ease-in-out;
 
+  p.Text2 {
+    color: var(--text-color);
+    float: left;
+    margin-right: 10px;
+    padding: 3px;
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    font-size: 15px;
+  }
+
   img {
     width: 150px;
     height: 150px;
@@ -90,6 +106,46 @@ section.LeftContainer {
     border-radius: 100px;
     float: none;
     display: block;
+  }
+
+  .Card-info {
+    perspective: 1000px;
+  }
+
+  .Card-inner {
+    position: relative;
+    width: 250px;
+    height: 222px;
+    transition: transform 0.8s;
+    transform-style: preserve-3d;
+  }
+
+  .Card-info:hover .Card-inner {
+    transform: rotateY(180deg);
+  }
+
+  .Card-front,
+  .Card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backface-visibility: hidden;
+    top: 0;
+    left: 0;
+  }
+
+  .Card-back {
+    transform: rotateY(180deg);
+  }
+
+  img.Card {
+    border-radius: 10px;
+    object-fit: cover;
+    width: 219px;
+    height: 219px;
   }
 
   p.Name {
@@ -164,13 +220,12 @@ section.Favshow {
   border-radius: 25px;
   box-shadow: 0 2px 5px #86b9b0;
   margin: 10px 0 200px;
-  width: 77%;
+  width: 97%;
   height: 495px;
   display: flex;
   justify-content: flex-start;
   gap: 10px;
   opacity: 0.9;
-  position: absolute;
   top: 100%;
   margin-bottom: 40px;
   text-align: center;
@@ -186,6 +241,7 @@ section.Favshow {
     font-size: 23px;
     font-weight: bold;
     text-decoration: underline;
+    overflow: hidden;
   }
 }
 
@@ -200,6 +256,7 @@ section.Favshow img {
   object-fit: cover;
   border-radius: 10px;
   border: 2px solid rgb(255, 255, 255, 0.684);
+  box-shadow: 0 0px 15px #1d4683;
   transition: all ease-in-out 0.5s;
   margin-bottom: 40px;
 }

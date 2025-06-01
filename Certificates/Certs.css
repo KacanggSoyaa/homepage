@@ -71,7 +71,7 @@ section.certificates {
   overflow-y: scroll;
   scrollbar-width: none;
 
-  em.ClubName {
+  em.Bold {
     font-weight: bold;
     color: #4cc9f0;
   }
