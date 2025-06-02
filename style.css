@@ -227,7 +227,7 @@ section.Favshow {
   gap: 10px;
   opacity: 0.9;
   top: 100%;
-  margin-bottom: 40px;
+  margin: 10px 0 0 0px;
   text-align: center;
   transition: opacity 0.3s ease-in-out;
 
@@ -263,6 +263,88 @@ section.Favshow img {
 
 section.Favshow img:hover {
   width: 25%;
+}
+
+section.FavPlaylist {
+  margin: 10px 0 0 0px;
+  background: #041421;
+  box-shadow: 0 2px 5px #86b9b0;
+  padding: 1rem;
+  width: 68%;
+  height: 195px;
+  border-radius: 25px;
+  margin: 10px 0 0 0px;
+  flex-direction: column;
+  display: flex; /*To make Position y and x is working together*/
+  justify-content: center; /*Content Position y*/
+  align-items: center; /*Content Position x*/
+  overflow-y: scroll;
+  scrollbar-width: none;
+
+  p.Textshow {
+    color: var(--text-color);
+    float: center;
+    margin-right: 10px;
+    padding: 3px;
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    font-size: 23px;
+    font-weight: bold;
+  }
+
+  a.playlink {
+    position: relative;
+    left: -250px;
+  }
+  p.playlink {
+    position: relative;
+    left: 10px;
+    top: -130px;
+  }
+  img.playlist {
+    border-radius: 0px;
+    object-fit: cover;
+    width: 119px;
+    height: 119px;
+    position: relative;
+    left: -250px;
+  }
+}
+
+section.FavGames2 {
+  background: #041421;
+  box-shadow: 0 2px 5px #86b9b0;
+  padding: 1rem;
+  width: 68%;
+  height: 195px;
+  border-radius: 25px;
+  margin: 10px 0 0 0px;
+  flex-direction: column;
+  display: flex; /*To make Position y and x is working together*/
+  justify-content: center; /*Content Position y*/
+  align-items: center; /*Content Position x*/
+  overflow-y: scroll;
+  scrollbar-width: none;
+}
+
+section.FavGames3 {
+  background: #041421;
+  box-shadow: 0 2px 5px #86b9b0;
+  padding: 1rem;
+  width: 300px;
+  height: 459px;
+  border-radius: 25px;
+  margin: 10px 0 0 0px;
+  position: relative;
+  top: -509px;
+  left: 72%;
+  flex-direction: column;
+
+  display: flex; /*To make Position y and x is working together*/
+  justify-content: center; /*Content Position y*/
+  align-items: center; /*Content Position x*/
+  overflow-y: scroll;
+  scrollbar-width: none;
 }
 
 footer {
