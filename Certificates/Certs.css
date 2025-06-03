@@ -51,7 +51,7 @@ body {
   font-family: Arial, sans-serif;
   line-height: 1.6;
   color: #333;
-  background-color: #f4f4f4;
+  background-color: var(--background-color);
 }
 
 section.certificates {

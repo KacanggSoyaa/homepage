@@ -265,8 +265,7 @@ section.Favshow img:hover {
   width: 25%;
 }
 
-section.FavPlaylist {
-  margin: 10px 0 0 0px;
+section.none {
   background: #041421;
   box-shadow: 0 2px 5px #86b9b0;
   padding: 1rem;
@@ -274,44 +273,62 @@ section.FavPlaylist {
   height: 195px;
   border-radius: 25px;
   margin: 10px 0 0 0px;
+  position: relative;
+
+  display: flex;
   flex-direction: column;
-  display: flex; /*To make Position y and x is working together*/
-  justify-content: center; /*Content Position y*/
-  align-items: center; /*Content Position x*/
-  overflow-y: scroll;
+  align-items: center;
+  /* Center items horizontally */
+  justify-content: flex-start;
+  /* Start items at the top */
+  overflow-y: auto;
   scrollbar-width: none;
+  opacity: 0.9;
+  transition: opacity 0.3s ease-in-out;
 
   p.Textshow {
-    color: var(--text-color);
-    float: center;
-    margin-right: 10px;
-    padding: 3px;
-    font-family: Arial, sans-serif;
-    line-height: 1.6;
-    font-size: 23px;
+    font-size: 25px;
     font-weight: bold;
+    color: var(--text-color);
+    font-family: Arial, sans-serif;
+    text-decoration: underline;
+    text-align: center;
+    margin: 0 0 1rem 0;
   }
 
-  a.playlink {
-    position: relative;
-    left: -250px;
-  }
-  p.playlink {
-    position: relative;
-    left: 10px;
-    top: -130px;
-  }
   img.playlist {
     border-radius: 0px;
     object-fit: cover;
-    width: 119px;
-    height: 119px;
-    position: relative;
-    left: -250px;
+    width: 200px;
+    height: 200px;
+  }
+
+  a.playlink {
+    display: block;
+    padding: 1px;
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    font-size: 23px;
+    text-align: center;
+    margin-bottom: 0.5rem;
+  }
+
+  p.Textspotify {
+    color: var(--text-color);
+    padding: 1px;
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    font-size: 20px;
+    text-align: left;
+    margin: 0;
   }
 }
+section.none:hover {
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
+}
 
-section.FavGames2 {
+section.none2 {
   background: #041421;
   box-shadow: 0 2px 5px #86b9b0;
   padding: 1rem;
@@ -319,15 +336,62 @@ section.FavGames2 {
   height: 195px;
   border-radius: 25px;
   margin: 10px 0 0 0px;
+  position: relative;
+
+  display: flex;
   flex-direction: column;
-  display: flex; /*To make Position y and x is working together*/
-  justify-content: center; /*Content Position y*/
-  align-items: center; /*Content Position x*/
-  overflow-y: scroll;
+  align-items: center;
+  /* Center items horizontally */
+  justify-content: flex-start;
+  /* Start items at the top */
+  overflow-y: auto;
   scrollbar-width: none;
+  opacity: 0.9;
+  transition: opacity 0.3s ease-in-out;
+
+  p.Textshow {
+    font-size: 25px;
+    font-weight: bold;
+    color: var(--text-color);
+    font-family: Arial, sans-serif;
+    text-decoration: underline;
+    text-align: center;
+    margin: 0 0 1rem 0;
+  }
+
+  img.playlist {
+    border-radius: 0px;
+    object-fit: cover;
+    width: 200px;
+    height: 200px;
+  }
+
+  a.playlink {
+    display: block;
+    padding: 1px;
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    font-size: 23px;
+    text-align: center;
+    margin-bottom: 0.5rem;
+  }
+
+  p.Textspotify {
+    color: var(--text-color);
+    padding: 1px;
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    font-size: 20px;
+    text-align: left;
+    margin: 0;
+  }
+}
+section.none2:hover {
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
 }
 
-section.FavGames3 {
+section.FavPlaylist {
   background: #041421;
   box-shadow: 0 2px 5px #86b9b0;
   padding: 1rem;
@@ -336,15 +400,60 @@ section.FavGames3 {
   border-radius: 25px;
   margin: 10px 0 0 0px;
   position: relative;
-  top: -509px;
-  left: 72%;
+  top: -506px;
+  left: 870px;
+  display: flex;
   flex-direction: column;
-
-  display: flex; /*To make Position y and x is working together*/
-  justify-content: center; /*Content Position y*/
-  align-items: center; /*Content Position x*/
-  overflow-y: scroll;
+  align-items: center;
+  /* Center items horizontally */
+  justify-content: flex-start;
+  /* Start items at the top */
+  overflow-y: auto;
   scrollbar-width: none;
+  opacity: 0.9;
+  transition: opacity 0.3s ease-in-out;
+  scroll-behavior: smooth;
+
+  p.Textshow {
+    font-size: 25px;
+    font-weight: bold;
+    color: var(--text-color);
+    font-family: Arial, sans-serif;
+    text-decoration: underline;
+    text-align: center;
+    margin: 0 0 1rem 0;
+  }
+
+  img.playlist {
+    border-radius: 0px;
+    object-fit: cover;
+    width: 200px;
+    height: 200px;
+  }
+
+  a.playlink {
+    display: block;
+    padding: 1px;
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    font-size: 23px;
+    text-align: center;
+    margin-bottom: 0.5rem;
+  }
+
+  p.Textspotify {
+    color: var(--text-color);
+    padding: 1px;
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    font-size: 20px;
+    text-align: left;
+    margin: 0;
+  }
+}
+section.FavPlaylist:hover {
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
 }
 
 footer {
