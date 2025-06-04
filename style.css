@@ -4,6 +4,7 @@
 
   --header-background: white;
   --header-text: #86b9b0;
+  --font-family: "Inter", Arial, sans-serif;
 }
 
 body,
@@ -89,12 +90,12 @@ section.LeftContainer {
   opacity: 0.9;
   transition: opacity 0.3s ease-in-out;
 
-  p.Text2 {
+  p.Text {
     color: var(--text-color);
     float: left;
     margin-right: 10px;
     padding: 3px;
-    font-family: Arial, sans-serif;
+    font-family: var(--font-family);
     line-height: 1.6;
     font-size: 15px;
   }
@@ -149,7 +150,7 @@ section.LeftContainer {
   }
 
   p.Name {
-    color: var(--text-color);
+    color: #78aec4;
     float: center;
     padding: 1px;
     font-family: Arial, sans-serif;
@@ -189,7 +190,7 @@ section.RightContainer {
     padding-bottom: 0px;
     font-size: 35px;
     font-weight: bold;
-    color: var(--text-color);
+    color: #78aec4;
     font-family: Arial, sans-serif;
     text-decoration: underline;
   }
@@ -205,7 +206,7 @@ section.RightContainer {
     float: left;
     margin-right: 10px;
     padding: 3px;
-    font-family: Arial, sans-serif;
+    font-family: var(--font-family);
     line-height: 1.6;
   }
 }
@@ -232,11 +233,11 @@ section.Favshow {
   transition: opacity 0.3s ease-in-out;
 
   p.Textshow {
-    color: var(--text-color);
+    color: #78aec4;
     float: center;
     margin-right: 10px;
     padding: 3px;
-    font-family: Arial, sans-serif;
+    font-family: var(--font-family);
     line-height: 1.6;
     font-size: 23px;
     font-weight: bold;
@@ -265,7 +266,7 @@ section.Favshow img:hover {
   width: 25%;
 }
 
-section.none {
+section.quote {
   background: #041421;
   box-shadow: 0 2px 5px #86b9b0;
   padding: 1rem;
@@ -289,46 +290,28 @@ section.none {
   p.Textshow {
     font-size: 25px;
     font-weight: bold;
-    color: var(--text-color);
+    color: #78aec4;
     font-family: Arial, sans-serif;
     text-decoration: underline;
     text-align: center;
     margin: 0 0 1rem 0;
   }
 
-  img.playlist {
-    border-radius: 0px;
-    object-fit: cover;
-    width: 200px;
-    height: 200px;
-  }
-
-  a.playlink {
-    display: block;
-    padding: 1px;
-    font-family: Arial, sans-serif;
-    line-height: 1.6;
-    font-size: 23px;
-    text-align: center;
-    margin-bottom: 0.5rem;
-  }
-
-  p.Textspotify {
+  p.Text {
+    font-size: 25px;
+    font-weight: bold;
     color: var(--text-color);
-    padding: 1px;
-    font-family: Arial, sans-serif;
-    line-height: 1.6;
-    font-size: 20px;
-    text-align: left;
-    margin: 0;
+    font-family: var(--font-family);
+    text-align: center;
+    margin: 0 0 1rem 0;
   }
 }
-section.none:hover {
+section.quote:hover {
   opacity: 1;
   transition: opacity 0.3s ease-in-out;
 }
 
-section.none2 {
+section.MiniGame {
   background: #041421;
   box-shadow: 0 2px 5px #86b9b0;
   padding: 1rem;
@@ -352,41 +335,44 @@ section.none2 {
   p.Textshow {
     font-size: 25px;
     font-weight: bold;
-    color: var(--text-color);
+    color: #78aec4;
     font-family: Arial, sans-serif;
     text-decoration: underline;
     text-align: center;
     margin: 0 0 1rem 0;
   }
-
-  img.playlist {
-    border-radius: 0px;
-    object-fit: cover;
-    width: 200px;
-    height: 200px;
-  }
-
-  a.playlink {
-    display: block;
-    padding: 1px;
-    font-family: Arial, sans-serif;
-    line-height: 1.6;
-    font-size: 23px;
-    text-align: center;
-    margin-bottom: 0.5rem;
-  }
-
-  p.Textspotify {
+  p.Text {
     color: var(--text-color);
     padding: 1px;
-    font-family: Arial, sans-serif;
+    font-family: var(--font-family);
     line-height: 1.6;
-    font-size: 20px;
-    text-align: left;
+    font-size: 19px;
+    text-align: center;
     margin: 0;
+    text-shadow: 0 0 8px #86b9b0, 0 0 16px #107462, 0 0 24px #089bd5;
+  }
+
+  .rps-btn {
+    background: linear-gradient(90deg, #1e3c72 0%, #6dd5fa 100%);
+    color: #fff;
+    border: none;
+    border-radius: 30px;
+    padding: 0.75em 2em;
+    font-size: 1.2em;
+    font-family: inherit;
+    font-weight: bold;
+    cursor: pointer;
+    margin: 0.5em;
+    box-shadow: 0 4px 14px 0 rgba(134, 185, 176, 0.15);
+    transition: transform 0.1s, box-shadow 0.1s, background 0.3s;
+  }
+  .rps-btn:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 24px 0 rgba(134, 185, 176, 0.25);
+    background: linear-gradient(90deg, #6dd5fa 0%, #1e3c72 100%);
   }
 }
-section.none2:hover {
+section.MiniGame:hover {
   opacity: 1;
   transition: opacity 0.3s ease-in-out;
 }
@@ -417,7 +403,7 @@ section.FavPlaylist {
   p.Textshow {
     font-size: 25px;
     font-weight: bold;
-    color: var(--text-color);
+    color: #78aec4;
     font-family: Arial, sans-serif;
     text-decoration: underline;
     text-align: center;
@@ -444,9 +430,9 @@ section.FavPlaylist {
   p.Textspotify {
     color: var(--text-color);
     padding: 1px;
-    font-family: Arial, sans-serif;
+    font-family: var(--font-family);
     line-height: 1.6;
-    font-size: 20px;
+    font-size: 19px;
     text-align: left;
     margin: 0;
   }
