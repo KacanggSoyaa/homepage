@@ -266,12 +266,27 @@ section.Favshow img:hover {
   width: 25%;
 }
 
+.FlexRow {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  width: 100%;
+  align-items: flex-start;
+}
+
+.LeftStack {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+
 section.quote {
   background: #041421;
   box-shadow: 0 2px 5px #86b9b0;
   padding: 1rem;
   width: 68%;
-  height: 195px;
+  height: 205px;
   border-radius: 25px;
   margin: 10px 0 0 0px;
   position: relative;
@@ -316,7 +331,7 @@ section.MiniGame {
   box-shadow: 0 2px 5px #86b9b0;
   padding: 1rem;
   width: 68%;
-  height: 195px;
+  height: 250px;
   border-radius: 25px;
   margin: 10px 0 0 0px;
   position: relative;
@@ -382,12 +397,11 @@ section.FavPlaylist {
   box-shadow: 0 2px 5px #86b9b0;
   padding: 1rem;
   width: 300px;
-  height: 459px;
+  height: 450px;
   border-radius: 25px;
   margin: 10px 0 0 0px;
   position: relative;
-  top: -506px;
-  left: 870px;
+
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -451,4 +465,12 @@ footer {
   background: #35424a;
   color: var(--text-color);
   position: fixed;
+}
+
+section.quote,
+section.MiniGame {
+  width: 100%;
+
+  min-width: 250px;
+  box-sizing: border-box;
 }

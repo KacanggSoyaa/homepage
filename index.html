@@ -2,7 +2,6 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KacanggSoyaa</title>
     <link rel="stylesheet" href="style.css" />
     <link href="https://fonts.googleapis.com/css?family=Inter:400,700&display=swap" rel="stylesheet">
@@ -143,22 +142,23 @@
         <img src="../Image/JujutsuKaisen.jpeg" alt="picture" />
         
         </section> 
-       
-      <section class="quote">
-         <p class="Textshow">Random Quote</p>
-         <p id="random-quote" class="Text">Loading quote...</p>
-        </section>    
-        
-        <section class="MiniGame">
-        <p class="Textshow">Mini Game: Rock-Paper-Scissors</p>
-        <div id="rps-game" style="text-align:center;">
-          <button class="rps-btn" data-choice="rock">🪨 Rock</button>
-          <button class="rps-btn" data-choice="paper">📄 Paper</button>
-          <button class="rps-btn" data-choice="scissors">✂️ Scissors</button>
-          <p id="rps-result" class="Text">Make your move!</p>
+       <div class="FlexRow">
+        <div class="LeftStack">
+          <section class="quote">
+            <p class="Textshow">Random Quote</p>
+            <p id="random-quote" class="Text">Loading quote...</p>
+          </section>  
+          <section class="MiniGame">
+            <p class="Textshow">Mini Game: Rock-Paper-Scissors</p>
+            <div id="rps-game" style="text-align:center;">
+              <button class="rps-btn" data-choice="rock">🪨 Rock</button>
+              <button class="rps-btn" data-choice="paper">📄 Paper</button>
+              <button class="rps-btn" data-choice="scissors">✂️ Scissors</button>
+              <p id="rps-result" class="Text">Make your move!</p>
+            </div>
+          </section>
         </div>
-        </section>
-      
+        
         <section class="FavPlaylist">
         <p class="Textshow">Favourite Playlist </p>
           <img class="playlist" src="../Image/Galau.png" alt="playlist" />  
@@ -167,7 +167,7 @@
             <p class="Textspotify">This is the playlist that i used to listen when I sad,
               especially when I miss someone or something.</p>
             
-            <p class="Textspotify">----------------------------------</p>
+            <p class="Textspotify">--------------------------</p>
             </p>
 
             <img class="playlist" src="../Image/English.png" alt="playlist" />  
@@ -175,12 +175,8 @@
             >Click here </a>
             <p class="Textspotify">This is the English songs that I love to listen when i'm study or do some work. 
               </p>
-           
-          
-         
-        
         </section>
-      
+      </div>
 
     </main>
     <footer>
