@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-paper-50 text-ink-900 dark:bg-ink-900 dark:text-paper-50 font-sans transition-colors duration-300;
+  }
+
+  ::selection {
+    @apply bg-amber/30;
+  }
+
+  :focus-visible {
+    outline: 2px solid #E8A33D;
+    outline-offset: 2px;
+  }
+}
+
+@layer utilities {
+  .container-page {
+    @apply max-w-content mx-auto px-6 sm:px-8;
+  }
+
+  .prompt::before {
+    content: '~/';
+    @apply text-amber/70 dark:text-amber/60 mr-1;
+  }
+
+  .caret {
+    display: inline-block;
+    width: 0.55ch;
+    background: currentColor;
+    margin-left: 2px;
+    animation: blink 1s steps(1) infinite;
+  }
+
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
+}
