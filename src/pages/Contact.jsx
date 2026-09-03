@@ -2,13 +2,19 @@ import { useState } from 'react'
 import { GithubIcon, LinkedinIcon, MailIcon, InstagramIcon } from '../components/Icons.jsx'
 
 export default function Contact() {
+  // Form state: tracks the current values of name, email, and message fields.
   const [form, setForm] = useState({ name: '', email: '', message: '' })
+
+  // Tracks whether the form has been submitted (shows confirmation message).
   const [sent, setSent] = useState(false)
 
+  // Update the corresponding field in form state when the user types.
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
+  // Handle form submission: prevent default browser submit, log to console,
+  // show confirmation, and reset the form fields.
   const handleSubmit = (e) => {
     e.preventDefault()
     // TODO: connect to a real backend or email service (e.g. Formspree, EmailJS)
@@ -18,13 +24,16 @@ export default function Contact() {
   }
 
   return (
+    // Section with id="contact" for anchor scrolling from the navbar
     <section id="contact" className="container-page py-16 sm:py-20 max-w-2xl">
+      {/* Section heading with terminal-style "~/contact" prompt */}
       <p className="prompt font-mono text-sm text-amber mb-2">contact</p>
       <h1 className="text-3xl font-mono font-semibold mb-3">Let's talk</h1>
       <p className="text-ink-700 dark:text-paper-200/80 mb-10">
         Reach out directly, or send a message below.
       </p>
 
+      {/* Social media / email quick-links row */}
       <div className="flex items-center gap-5 mb-10">
         <a href="mailto:kacanggsoyaa18@gmail.com" className="flex items-center gap-2 font-mono text-sm text-ink-700 dark:text-paper-200/80 hover:text-amber transition-colors">
           <MailIcon /> email
@@ -40,7 +49,9 @@ export default function Contact() {
         </a>
       </div>
 
+      {/* Contact form with name, email, and message fields */}
       <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Name input field */}
         <div>
           <label htmlFor="name" className="font-mono text-xs text-ink-600 dark:text-paper-200/60">
             name
@@ -56,6 +67,7 @@ export default function Contact() {
           />
         </div>
 
+        {/* Email input field */}
         <div>
           <label htmlFor="email" className="font-mono text-xs text-ink-600 dark:text-paper-200/60">
             email
@@ -71,6 +83,7 @@ export default function Contact() {
           />
         </div>
 
+        {/* Message textarea */}
         <div>
           <label htmlFor="message" className="font-mono text-xs text-ink-600 dark:text-paper-200/60">
             message
@@ -86,6 +99,7 @@ export default function Contact() {
           />
         </div>
 
+        {/* Submit button */}
         <button
           type="submit"
           className="px-5 py-2.5 rounded-md bg-amber text-ink-950 font-mono text-sm font-medium hover:bg-amber-light transition-colors"
@@ -93,6 +107,7 @@ export default function Contact() {
           Send message
         </button>
 
+        {/* Confirmation message shown after form submission */}
         {sent && (
           <p className="font-mono text-sm text-teal">
             Message logged to console — connect a backend to actually send it.

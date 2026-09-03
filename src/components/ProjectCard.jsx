@@ -1,8 +1,12 @@
 import { GithubIcon, ExternalLinkIcon } from './Icons.jsx'
 
+// ProjectCard displays a single project in the projects grid.
+// Props: { project } — an object with title, description, stack, github, and demo.
 export default function ProjectCard({ project }) {
   return (
+    // Card with border that highlights amber on hover
     <article className="group border border-ink-200/15 dark:border-paper-50/10 rounded-lg p-6 flex flex-col gap-4 hover:border-amber/50 transition-colors">
+      {/* Header row: project title on the left, GitHub + demo icons on the right */}
       <div className="flex items-start justify-between gap-3">
         <h3 className="font-mono text-lg font-semibold">{project.title}</h3>
         <div className="flex items-center gap-3 text-ink-600 dark:text-paper-200/70 shrink-0">
@@ -15,10 +19,12 @@ export default function ProjectCard({ project }) {
         </div>
       </div>
 
+      {/* Project description */}
       <p className="text-sm leading-relaxed text-ink-700 dark:text-paper-200/80">
         {project.description}
       </p>
 
+      {/* Tech stack tags: pushed to the bottom with mt-auto */}
       <div className="flex flex-wrap gap-2 mt-auto pt-2">
         {project.stack.map((tech) => (
           <span

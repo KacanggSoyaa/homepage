@@ -1,36 +1,58 @@
+/* ============================================================
+   Tailwind CSS layers — these imports load Tailwind's built-in
+   base styles, component utilities, and utility classes.
+   ============================================================ */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================
+   Base layer — global styles applied to HTML elements.
+   These sit below component styles in specificity.
+   ============================================================ */
 @layer base {
+  /* Enable smooth scrolling for anchor links across the site */
   html {
     scroll-behavior: smooth;
   }
 
+  /* Set default body colors and font based on the current theme (dark/light).
+     transition-colors makes theme switches animate smoothly. */
   body {
     @apply bg-paper-50 text-ink-900 dark:bg-ink-900 dark:text-paper-50 font-sans transition-colors duration-300;
   }
 
+  /* Highlight selected text with a semi-transparent amber tint */
   ::selection {
     @apply bg-amber/30;
   }
 
+  /* Accessible focus ring: a 2px amber outline shown only on keyboard focus */
   :focus-visible {
     outline: 2px solid #E8A33D;
     outline-offset: 2px;
   }
 }
 
+/* ============================================================
+   Utility layer — custom utility classes used across components.
+   ============================================================ */
 @layer utilities {
+  /* Centered page container with horizontal padding and a max-width.
+     Used on almost every section to keep content aligned. */
   .container-page {
     @apply max-w-content mx-auto px-6 sm:px-8;
   }
 
+  /* Adds a "~/ " prefix before text in amber color.
+     Used on nav links and section headings to mimic a terminal prompt. */
   .prompt::before {
     content: '~/';
     @apply text-amber/70 dark:text-amber/60 mr-1;
   }
 
+  /* Blinking cursor animation for the "$ whoami" prompt on the home hero.
+     Simulates a terminal cursor with a 1-second blink cycle. */
   .caret {
     display: inline-block;
     width: 0.55ch;
@@ -43,6 +65,8 @@
     50% { opacity: 0; }
   }
 
+  /* Horizontal scrolling marquee used for the skills ticker in the hero panel.
+     Moves content left continuously over 22 seconds, pauses on hover. */
   .marquee-track {
     animation: marquee 22s linear infinite;
   }
@@ -56,12 +80,15 @@
     to { transform: translateX(-50%); }
   }
 
+  /* Disable marquee animation for users who prefer reduced motion */
   @media (prefers-reduced-motion: reduce) {
     .marquee-track {
       animation: none;
     }
   }
 
+  /* Shorter marquee animation used inline in the hero JSON panel.
+     Scrolls the "Languages" field value across 10 seconds. */
   .animate-marquee-inline {
     animation: marquee-inline 10s linear infinite;
   }

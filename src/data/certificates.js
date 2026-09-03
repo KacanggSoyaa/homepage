@@ -1,4 +1,6 @@
-// TODO: replace with real certificate — swap out name, issuer, date, and link
+// Certificates data: array of certificate objects displayed in the Certificates section.
+// Each certificate has: id (unique key), name, issuer (organization), date, link (credential URL).
+// TODO: replace these placeholders with your real certifications.
 export const certificates = [
   {
     id: 1,
