@@ -81,7 +81,7 @@ export default function About() {
         <h2 className="font-mono text-xl font-semibold mt-12 mb-5">Education</h2>
         {/* TODO: replace with real education/experience */}
         <div className="border-l-2 border-ink-200/20 dark:border-paper-50/15 pl-5">
-          <p className="font-mono text-sm font-medium">Sijil Pelajaran Malaysia (SPM)</p>
+          <p className="font-mono text-sm font-medium hover:text-amber transition-colors">Sijil Pelajaran Malaysia (SPM)</p>
           <p className="text-sm text-ink-700 dark:text-paper-200/70 mt-1">
             Finished my SPM in 2023 from SMK Dato' Wan Ahmad Rasdi, Perak, Malaysia
           </p>
@@ -92,7 +92,7 @@ export default function About() {
         </div>
         <br />
         <div className="border-l-2 border-ink-200/20 dark:border-paper-50/15 pl-5">
-          <p className="font-mono text-sm font-medium">Diploma in Information Technology</p>
+          <p className="font-mono text-sm font-medium hover:text-amber transition-colors">Diploma in Information Technology</p>
           <p className="text-sm text-ink-700 dark:text-paper-200/70 mt-1">
             Expected graduation in early 2027 from Politeknik Ungku Omar (PUO)
           </p>
