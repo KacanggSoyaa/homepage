@@ -86,10 +86,20 @@
   /* Default body colors + font based on the current theme (dark/light).
      In dark mode the background is deep space black (space-950) so the
      glowing moon, sun, and stars in SpaceBackground stand out clearly.
-     A faint radial tint adds depth to the otherwise flat black void.
+     In light mode it is a soft "daylight sky" gradient.
      transition-colors makes theme switches animate smoothly. */
   body {
     @apply bg-paper-50 text-ink-900 dark:bg-space-950 dark:text-paper-50 font-sans transition-colors duration-300;
+  }
+
+  /* Light-mode background: a soft, muted daylight sky (gentle on the eyes).
+     The top is a calm blue-grey and it eases into a faint warm haze at the
+     bottom. Kept deliberately low-contrast so it does not glare like pure
+     white while still feeling bright and airy. */
+  body {
+    background-image:
+      linear-gradient(180deg, #DCE6F0 0%, #E7EAF0 45%, #ECE6EA 80%, #EEEFEC 100%);
+    background-attachment: fixed;
   }
 
   /* Dark-mode background depth: a very subtle blue/purple radial tint that
@@ -206,4 +216,22 @@
 /* Soft white text glow — used on large headings (space-like) */
 @utility text-glow-white {
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.45);
+}
+
+/* ============================================================
+   Glass card utility — frosted translucent surface with a soft shadow.
+   Used on cards/panels so content stays readable over the animated
+   background in both light ("daylight") and dark ("space") modes.
+   ============================================================ */
+@utility glass {
+  background: rgba(255, 255, 255, 0.55);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 24px -12px rgba(23, 30, 60, 0.18);
+}
+
+/* Dark-mode glass: a deep translucent black that reads well over the space scene */
+.dark .glass {
+  background: rgba(5, 7, 15, 0.6);
+  box-shadow: 0 8px 24px -12px rgba(0, 0, 0, 0.5);
 }

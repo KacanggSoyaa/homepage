@@ -6,10 +6,10 @@ import { GithubIcon, ExternalLinkIcon } from './Icons.jsx'
 export default function ProjectCard({ project }) {
   return (
     // Card with border that highlights amber on hover.
-    // A translucent dark backdrop in dark mode keeps text readable over the
-    // animated space background. Hover lifts the card + adds a soft shadow for
-    // a more polished, tactile feel.
-    <article className="group border border-ink-200/15 dark:border-paper-50/10 dark:bg-space-900/60 dark:backdrop-blur-sm rounded-lg p-6 flex flex-col gap-4 hover:border-amber/50 transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-amber/10">
+    // Uses the `glass` utility (frosted translucent surface) so content stays
+    // readable over the animated background in both light and dark modes.
+    // Hover lifts the card + adds a soft shadow for a polished, tactile feel.
+    <article className="group glass border border-ink-200/15 dark:border-paper-50/10 rounded-lg p-6 flex flex-col gap-4 hover:border-amber/50 transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-amber/10">
       {/* Header row: project title on the left, GitHub + demo icons on the right */}
       <div className="flex items-start justify-between gap-3">
         <h3 className="font-mono text-lg font-semibold">{project.title}</h3>

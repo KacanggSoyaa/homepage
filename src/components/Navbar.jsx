@@ -1,7 +1,9 @@
 // Navbar.jsx — sticky top navigation bar.
 // Shows the brand logo, section links + About link, and a theme toggle.
-// Renders a horizontal desktop menu (≥640px) and a scrollable mobile bar.
+// Fully responsive: a horizontal desktop menu (≥640px) and, on smaller
+// screens, a hamburger icon that opens a collapsible dropdown menu.
 
+import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { SunIcon, MoonIcon } from './Icons.jsx'
 
@@ -15,12 +17,15 @@ const sectionLinks = [
 ]
 
 export default function Navbar({ theme, toggleTheme }) {
+  // Tracks whether the mobile dropdown menu is open.
+  const [menuOpen, setMenuOpen] = useState(false)
+
   return (
     // Sticky header bar that stays at the top of the viewport.
     // Uses backdrop-blur for a frosted-glass effect over content below.
     // In dark mode its translucent black (space) tint blends with the sky.
     <header className="border-b border-ink-200/10 dark:border-paper-50/5 bg-paper-50/80 dark:bg-space-900/70 backdrop-blur-md sticky top-0 z-50">
-      {/* Main nav bar: brand logo on the left, links in the center, theme toggle on the right */}
+      {/* Main nav bar: brand logo on the left, links in the center, theme toggle + hamburger on the right */}
       <nav className="container-page flex items-center justify-between h-16">
         {/* Brand logo — links back to home */}
         <NavLink to="/" className="group font-mono text-sm font-semibold tracking-tight">
@@ -30,7 +35,7 @@ export default function Navbar({ theme, toggleTheme }) {
         </NavLink>
 
         {/* Desktop navigation: horizontal list of section links + About page link.
-            Hidden on mobile (shown below sm breakpoint). */}
+            Hidden on mobile (shown from sm breakpoint up). */}
         <ul className="hidden sm:flex items-center gap-1 font-mono text-sm">
           {/* Section links — anchor hrefs that scroll to sections on the main page.
               Each gets a subtle pill highlight on hover for a cleaner UI. */}
@@ -61,8 +66,9 @@ export default function Navbar({ theme, toggleTheme }) {
           </li>
         </ul>
 
-        {/* Theme toggle button: shows sun icon in dark mode, moon icon in light mode */}
+        {/* Right-side controls: theme toggle (always visible) + hamburger (mobile only) */}
         <div className="flex items-center gap-3">
+          {/* Theme toggle button: shows sun icon in dark mode, moon icon in light mode */}
           <button
             onClick={toggleTheme}
             aria-label="Toggle color theme"
@@ -70,39 +76,71 @@ export default function Navbar({ theme, toggleTheme }) {
           >
             {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
           </button>
+
+          {/* Hamburger button — only visible on mobile (below sm). Toggles the
+              dropdown menu. The three bars animate into an "X" when open. */}
+          <button
+            onClick={() => setMenuOpen((open) => !open)}
+            aria-label="Toggle menu"
+            aria-expanded={menuOpen}
+            className="sm:hidden w-9 h-9 flex flex-col items-center justify-center gap-1.5 rounded-md border border-ink-200/20 dark:border-paper-50/10 text-ink-700 dark:text-paper-200 hover:border-amber/60 transition-all"
+          >
+            <span
+              className={`w-5 h-0.5 rounded-full bg-current transition-all ${
+                menuOpen ? 'translate-y-1.5 rotate-45' : ''
+              }`}
+            />
+            <span
+              className={`w-5 h-0.5 rounded-full bg-current transition-all ${
+                menuOpen ? 'opacity-0' : ''
+              }`}
+            />
+            <span
+              className={`w-5 h-0.5 rounded-full bg-current transition-all ${
+                menuOpen ? '-translate-y-1.5 -rotate-45' : ''
+              }`}
+            />
+          </button>
         </div>
       </nav>
 
-      {/* Mobile navigation: horizontally scrollable list of links.
-          Visible only below the sm breakpoint (640px). */}
-      <ul className="sm:hidden flex overflow-x-auto gap-1 px-4 pb-3 font-mono text-xs">
-        {/* Section links for mobile */}
-        {sectionLinks.map((link) => (
-          <li key={link.href}>
-            <a
-              href={link.href}
-              className="prompt px-2.5 py-1.5 rounded-md whitespace-nowrap transition-colors text-ink-600 dark:text-paper-200/70 hover:text-ink-900 dark:hover:text-paper-50"
+      {/* Mobile dropdown menu: a stacked list of all links + About.
+          Shown only on mobile (below sm) and only when the hamburger is open.
+          Uses the same frosted styling as the header so it blends in. */}
+      <div
+        className={`sm:hidden overflow-hidden transition-[max-height,opacity] duration-300 ${
+          menuOpen ? 'max-h-80 opacity-100' : 'max-h-0 opacity-0'
+        }`}
+      >
+        <ul className="flex flex-col px-4 pb-4 gap-1 font-mono text-sm">
+          {sectionLinks.map((link) => (
+            <li key={link.href}>
+              <a
+                href={link.href}
+                onClick={() => setMenuOpen(false)}
+                className="block prompt px-3 py-2.5 rounded-md transition-colors text-ink-600 dark:text-paper-200/70 hover:text-ink-900 dark:hover:text-paper-50 hover:bg-ink-900/5 dark:hover:bg-paper-50/5"
+              >
+                {link.label}
+              </a>
+            </li>
+          ))}
+          <li>
+            <NavLink
+              to="/about"
+              onClick={() => setMenuOpen(false)}
+              className={({ isActive }) =>
+                `block prompt px-3 py-2.5 rounded-md transition-colors ${
+                  isActive
+                    ? 'text-amber dark:text-glow-amber bg-ink-900/5 dark:bg-paper-50/5'
+                    : 'text-ink-600 dark:text-paper-200/70 hover:text-ink-900 dark:hover:text-paper-50 hover:bg-ink-900/5 dark:hover:bg-paper-50/5'
+                }`
+              }
             >
-              {link.label}
-            </a>
+              about
+            </NavLink>
           </li>
-        ))}
-        {/* About link for mobile */}
-        <li>
-          <NavLink
-            to="/about"
-            className={({ isActive }) =>
-              `prompt px-2.5 py-1.5 rounded-md whitespace-nowrap transition-colors ${
-                isActive
-                  ? 'text-amber dark:text-glow-amber'
-                  : 'text-ink-600 dark:text-paper-200/70 hover:text-ink-900 dark:hover:text-paper-50'
-              }`
-            }
-          >
-            about
-          </NavLink>
-        </li>
-      </ul>
+        </ul>
+      </div>
     </header>
   )
 }

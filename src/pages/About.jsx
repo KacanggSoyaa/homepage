@@ -4,6 +4,7 @@
 
 import { skillGroups } from '../data/skills.js'
 import ScrollReveal from '../components/ScrollReveal.jsx'
+import photo from '../components/img/profilePicture.jpg'
 
 export default function About() {
   return (
@@ -11,18 +12,41 @@ export default function About() {
       {/* Section heading with terminal-style "~/about" prompt */}
       <ScrollReveal>
         <p className="prompt font-mono text-sm text-amber mb-2 dark:text-amber">about</p>
-        <h1 className="text-3xl font-mono font-semibold mb-6 dark:text-glow-amber">A bit about me</h1>
+        <h1 className="text-3xl font-mono font-semibold mb-8 dark:text-glow-amber">A bit about me</h1>
       </ScrollReveal>
 
-      {/* Bio paragraph introducing who I am */}
-      <ScrollReveal delay={100}>
-        <p className="text-ink-700 dark:text-paper-200/80 leading-relaxed">
-          I'm Danis Nazri, an IT student based in Kuala Lumpur, Malaysia,
-          focused on software and app development. I'm passionate about
-          website development and enjoy turning ideas into working products —
-          from backend logic to interfaces people actually enjoy using.
-        </p>
-      </ScrollReveal>
+      {/* Profile row: photo card on the left, bio text on the right.
+          Stacks vertically on small screens and becomes two columns from md up. */}
+      <div className="md:flex md:items-start md:gap-8">
+        {/* Photo card — fixed at a 4:3 aspect ratio.
+            To swap the image, replace src={photo} with a different import or URL. */}
+        <ScrollReveal className="md:w-80 md:shrink-0 mb-8 md:mb-0">
+          <div className="glass rounded-lg border border-ink-200/15 dark:border-paper-50/10 overflow-hidden aspect-[3/4]">
+            <img src={photo} alt="Danis Nazri" className="w-full h-full object-cover" />
+          </div>
+        </ScrollReveal>
+
+        {/* Bio paragraph introducing who I am */}
+        <ScrollReveal delay={100} className="flex-1">
+          <p className="text-ink-700 dark:text-paper-200/80 leading-relaxed">
+            I'm Danis Nazri, an IT student based in Kuala Lumpur, Malaysia,
+            focused on software and app development. I'm passionate about
+            website development and enjoy my time learn something that might be useful
+            in the future.
+          </p>
+          <br />
+          <p className="text-ink-700 dark:text-paper-200/80 leading-relaxed">
+            I'm Also a person who loves nature and I enjoy spending time outdoors, 
+            whether it's hiking, camping, or simply taking a walk in the park. I find 
+            that being in nature helps me recharge and gain new perspectives.
+          </p>
+          <br />
+          <p className="text-ink-700 dark:text-paper-200/80 leading-relaxed">
+            I would call myself an ambivert, I enjoy socializing and meeting new people, 
+            but I also value my alone time and peace.
+          </p>
+        </ScrollReveal>
+      </div>
 
       {/* Skills section: iterates over skill groups from data/skills.js */}
       <ScrollReveal delay={150}>
@@ -57,12 +81,25 @@ export default function About() {
         <h2 className="font-mono text-xl font-semibold mt-12 mb-5">Education</h2>
         {/* TODO: replace with real education/experience */}
         <div className="border-l-2 border-ink-200/20 dark:border-paper-50/15 pl-5">
-          <p className="font-mono text-sm font-medium">School / Course Name</p>
+          <p className="font-mono text-sm font-medium">Sijil Pelajaran Malaysia (SPM)</p>
           <p className="text-sm text-ink-700 dark:text-paper-200/70 mt-1">
-            Expected graduation — replace with your details
+            Finished my SPM in 2023 from SMK Dato' Wan Ahmad Rasdi, Perak, Malaysia
           </p>
           <p className="text-sm text-ink-700 dark:text-paper-200/70 mt-2">
-            Relevant coursework, internships, or certifications go here.
+            In my highschool, I was person who was strongly introverted and doesn't like to speak in front of people.
+            I was also a person who was not good at managing my time and I was not a good team player.
+          </p>
+        </div>
+        <br />
+        <div className="border-l-2 border-ink-200/20 dark:border-paper-50/15 pl-5">
+          <p className="font-mono text-sm font-medium">Diploma in Information Technology</p>
+          <p className="text-sm text-ink-700 dark:text-paper-200/70 mt-1">
+            Expected graduation in early 2027 from Politeknik Ungku Omar (PUO)
+          </p>
+          <p className="text-sm text-ink-700 dark:text-paper-200/70 mt-2">
+            I'm quite actively involved in my college's IT club, and learn to be brave
+            to speak in front of people. I also learn to be a good team player and
+            how to manage my time wisely.
           </p>
         </div>
       </ScrollReveal>

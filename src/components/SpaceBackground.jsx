@@ -26,6 +26,8 @@ export default function SpaceBackground({ theme = 'dark' }) {
     let width = 0
     let height = 0
     let stars = [] // static twinkling background stars
+    let clouds = [] // soft drifting clouds (light mode / daylight sky)
+    let birds = [] // animated 2D birds flying across the sky (light mode)
     let meteors = [] // active shooting stars
     let reducedMotion = false // respect prefers-reduced-motion
     let animationId = null // requestAnimationFrame handle (for cleanup)
@@ -60,6 +62,7 @@ export default function SpaceBackground({ theme = 'dark' }) {
       canvas.style.height = `${height}px`
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
       buildStars()
+      buildClouds()
     }
 
     // Generate a star field with random positions, sizes, and twinkle phases.
@@ -90,7 +93,100 @@ export default function SpaceBackground({ theme = 'dark' }) {
       })
     }
 
-    // Track scroll position and smoothly interpolate toward the target.
+    // Generate a field of soft clouds for the daylight (light) theme.
+    // Each cloud is a cluster of overlapping translucent white puffs that
+    // drift slowly across the sky (a gentle "windy" feel). Only used in light
+    // mode — dark mode keeps a clear starry sky.
+    const buildClouds = () => {
+      const count = Math.min(7, Math.floor(width / 360))
+      clouds = Array.from({ length: count }, () => ({
+        x: Math.random() * width,
+        y: Math.random() * height * 0.85 + height * 0.05,
+        scale: Math.random() * 40 + 20, // puff size (cloud "thickness")
+        w: Math.random() * 90 + 60, // horizontal puff spacing
+        puffCount: Math.floor(Math.random() * 3) + 3, // puffs per cloud
+        speed: Math.random() * 0.12 + 0.05, // horizontal wind speed
+        phase: Math.random() * Math.PI * 2, // wobble phase
+        alpha: Math.random() * 0.16 + 0.08, // translucency (soft, not stark white)
+      }))
+    }
+
+    // Draw the drifting clouds. Each cloud moves horizontally at its own speed
+    // (wind) and wobbles gently up/down for a light, airy feel. When a cloud
+    // exits the right edge it wraps around to the left, keeping the sky flowing.
+    const drawClouds = () => {
+      if (isSpace) return // no clouds in the dark space scene
+      clouds.forEach((c) => {
+        // Horizontal wind drift + a subtle vertical wobble
+        const x = c.x + timer * c.speed
+        const wobble = Math.sin(timer * 0.004 + c.phase) * 4
+        // Wrap clouds left→right as they drift off the right edge
+        const wrapped = x > width + c.w * 2 ? -(c.w * 2) : x
+
+        // Draw the cloud as several overlapping soft puffs
+        for (let i = 0; i < c.puffCount; i++) {
+          const px = wrapped + i * c.w * 0.6
+          const py = c.y + wobble + Math.sin(i * 1.3 + c.phase) * 6
+          drawGlow(px, py, c.scale, '255,255,255', c.alpha)
+        }
+      })
+    }
+
+    // Create a new flying bird for the light-mode sky. Birds fly left→right
+    // across the scene with a small per-bird speed and vertical bob so a small
+    // flock feels alive and "windy". Only spawned in light mode.
+    const createBird = () => ({
+      x: -40, // start just off the left edge
+      y: height * (0.1 + Math.random() * 0.3), // fly in the upper sky band
+      size: 4 + Math.random() * 3, // bird body size
+      speed: 0.5 + Math.random() * 1.2, // horizontal wind speed
+      bob: Math.random() * 0.02 + 0.01, // vertical bob frequency
+      phase: Math.random() * Math.PI * 2, // flapping/wobble phase offset
+      flap: Math.random() * 0.12 + 0.08, // wing-flap frequency
+    })
+
+    // Draw a single 2D bird as a minimal "M" / wing-shaped silhouette. Each
+    // wing rises and falls over time to simulate flapping while the whole bird
+    // bobs gently — the classic simple "flying bird" look used in 2D sky scenes.
+    const drawBird = (b) => {
+      const flap = Math.sin(timer * b.flap + b.phase) // -1..1 wing position
+      const wing = b.size * (0.6 + flap * 0.6) // wing lift (higher = drawn up)
+      const bobY = Math.sin(timer * b.bob + b.phase) * 4 // gentle vertical float
+      const y = b.y + bobY
+
+      ctx.strokeStyle = '#3A4A5C'
+      ctx.lineWidth = 1.4
+      ctx.lineCap = 'round'
+
+      // Two mirrored wings. Each is a two-segment line forming a soft "M" —
+      // the tip lifts up as it flaps, then comes back down.
+      ;[0, 1].forEach((side) => {
+        const dir = side === 0 ? -1 : 1 // mirror the two wings
+        ctx.beginPath()
+        ctx.moveTo(b.x, y - 1)
+        ctx.lineTo(b.x + dir * b.size * 0.6, y - wing)
+        ctx.lineTo(b.x + dir * b.size * 1.2, y - wing * 0.3)
+        ctx.stroke()
+      })
+
+      // Tiny dot for the body/head
+      ctx.fillStyle = '#3A4A5C'
+      ctx.beginPath()
+      ctx.arc(b.x, y - 1, 1.4, 0, Math.PI * 2)
+      ctx.fill()
+    }
+
+    // Advance and draw every active bird. Each moves horizontally on the wind;
+    // birds that fly off the right edge are removed. New birds are spawned by
+    // renderScene (light mode only) to keep a gentle flock in the sky.
+    const updateAndDrawBirds = () => {
+      birds.forEach((b, i) => {
+        b.x += b.speed * (isSpace ? 0.1 : 1) // (speed only matters in light mode)
+        drawBird(b)
+        if (b.x > width + 60) birds.splice(i, 1)
+      })
+    }
+
     // The smoothed value gives a gentle, non-jerky parallax drift.
     const updateScroll = () => {
       parallaxTarget = window.scrollY || window.pageYOffset || 0
@@ -219,6 +315,29 @@ export default function SpaceBackground({ theme = 'dark' }) {
       })
     }
 
+    // Draw a bright, soft "daylight" sun for light mode. It sits high in the
+    // sky with a gentle warm halo, so the light theme keeps a celestial focal
+    // point without the dramatic glow of the dark-mode sun.
+    const drawDaylightSun = () => {
+      const rad = Math.min(width, height) * 0.05
+      const cx = width * 0.82
+      const cy = height * 0.2
+
+      // Very soft outer halo (light, airy)
+      drawGlow(cx, cy, rad * 4, '255,214,150', 0.35)
+      drawGlow(cx, cy, rad * 2.2, '255,235,180', 0.5)
+
+      // Sun body — pale warm white with a soft amber rim
+      const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, rad)
+      g.addColorStop(0, 'rgba(255,255,255,0.95)')
+      g.addColorStop(0.6, 'rgba(255,224,160,0.9)')
+      g.addColorStop(1, 'rgba(255,190,110,0.85)')
+      ctx.fillStyle = g
+      ctx.beginPath()
+      ctx.arc(cx, cy, rad, 0, Math.PI * 2)
+      ctx.fill()
+    }
+
     // Draw one complete scene. When `animate` is true the stars twinkle and
     // meteors move (used by the animation loop); when false a single static
     // frame is drawn (used for prefers-reduced-motion).
@@ -239,13 +358,18 @@ export default function SpaceBackground({ theme = 'dark' }) {
       drawGlow(width * 0.75, height * 0.75 - nebulaDrift, Math.min(width, height) * 0.5, palette.nebula, isSpace ? 0.05 : 0.03)
       drawGlow(width * 0.2, height * 0.2 - nebulaDrift, Math.min(width, height) * 0.4, palette.nebula2, isSpace ? 0.04 : 0.02)
 
+      // ---- Drifting clouds (light mode only) — the "windy" daylight sky ----
+      drawClouds()
+
       // ---- Twinkling background stars (each on its own parallax layer) ----
       stars.forEach((star) => {
         // Opacity oscillates over time for a gentle "twinkle" effect
         const twinkle = animate
           ? 0.4 + 0.6 * (0.5 + 0.5 * Math.sin(star.phase + timer * star.speed))
           : star.brightness * 0.8
-        const alpha = isSpace ? twinkle : twinkle * 0.4
+        // In dark mode stars are bright and twinkling; in light mode they are
+        // extremely faint pinpricks so the daylight sky stays clean.
+        const alpha = isSpace ? twinkle : twinkle * 0.12
         // Apply the star's parallax: its y-position shifts up as you scroll down
         const y = reducedMotion ? star.y : star.y - scrollY * star.parallax
         // Wrap around so stars leave the top edge and re-enter from the bottom
@@ -256,17 +380,31 @@ export default function SpaceBackground({ theme = 'dark' }) {
         ctx.fill()
       })
 
-      // ---- Solar system (sun, orbits, planets) — slow parallax layer ----
+      // ---- Solar system (sun, orbits, planets) — slow parallax layer.
+      // In dark mode the sun glows warmly in space; in light mode it becomes
+      // a soft "daylight" sun that still fits the sky. ----
       if (isSpace) {
         const sunDrift = reducedMotion ? 0 : scrollY * 0.1
         drawSunSystem(-sunDrift)
+      } else {
+        drawDaylightSun()
       }
 
-      // ---- Moon — mid parallax layer (slower than near stars) ----
+      // ---- Moon — dark space mode only (in light mode the sun takes the sky) ----
       if (isSpace) {
         const moonDrift = reducedMotion ? 0 : scrollY * 0.12
         drawMoon(-moonDrift)
       }
+
+      // ---- Flying birds (light mode only — the animated, "windy" sky) ----
+      if (animate && !isSpace) {
+        // Occasionally add a new bird while fewer than 5 are in the sky, so a
+        // small flock keeps flapping across the daylight scene.
+        if (Math.random() < 0.02 && birds.length < 5) {
+          birds.push(createBird())
+        }
+      }
+      updateAndDrawBirds()
 
       // ---- Shooting stars (only move when animating) ----
       if (animate && isSpace) {

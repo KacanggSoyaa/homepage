@@ -90,7 +90,7 @@ export default function Home() {
             In dark mode a translucent dark backdrop keeps the code readable
             over the animated space background. */}
         <ScrollReveal delay={300} y={32}>
-          <div className="rounded-lg border border-ink-200/15 dark:border-paper-50/10 dark:bg-space-900/70 dark:backdrop-blur-sm overflow-hidden shadow-sm">
+          <div className="glass rounded-lg border border-ink-200/15 dark:border-paper-50/10 overflow-hidden">
             {/* Window header with macOS-style traffic light dots and filename */}
             <div className="flex items-center gap-1.5 px-4 py-3 bg-ink-900/5 dark:bg-paper-50/5 border-b border-ink-200/10 dark:border-paper-50/10">
               <span className="w-2.5 h-2.5 rounded-full bg-red-400/70" />
