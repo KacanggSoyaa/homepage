@@ -1,12 +1,11 @@
 import { NavLink } from 'react-router-dom'
 import { SunIcon, MoonIcon } from './Icons.jsx'
 
-const links = [
-  { to: '/', label: 'home' },
-  { to: '/about', label: 'about' },
-  { to: '/projects', label: 'projects' },
-  { to: '/certificates', label: 'certificates' },
-  { to: '/contact', label: 'contact' },
+const sectionLinks = [
+  { href: '/#home', label: 'home' },
+  { href: '/#projects', label: 'projects' },
+  { href: '/#certificates', label: 'certificates' },
+  { href: '/#contact', label: 'contact' },
 ]
 
 export default function Navbar({ theme, toggleTheme }) {
@@ -20,23 +19,30 @@ export default function Navbar({ theme, toggleTheme }) {
         </NavLink>
 
         <ul className="hidden sm:flex items-center gap-1 font-mono text-sm">
-          {links.map((link) => (
-            <li key={link.to}>
-              <NavLink
-                to={link.to}
-                end={link.to === '/'}
-                className={({ isActive }) =>
-                  `prompt px-3 py-2 rounded-md transition-colors ${
-                    isActive
-                      ? 'text-amber'
-                      : 'text-ink-600 dark:text-paper-200/70 hover:text-ink-900 dark:hover:text-paper-50'
-                  }`
-                }
+          {sectionLinks.map((link) => (
+            <li key={link.href}>
+              <a
+                href={link.href}
+                className="prompt px-3 py-2 rounded-md transition-colors text-ink-600 dark:text-paper-200/70 hover:text-ink-900 dark:hover:text-paper-50"
               >
                 {link.label}
-              </NavLink>
+              </a>
             </li>
           ))}
+          <li>
+            <NavLink
+              to="/about"
+              className={({ isActive }) =>
+                `prompt px-3 py-2 rounded-md transition-colors ${
+                  isActive
+                    ? 'text-amber'
+                    : 'text-ink-600 dark:text-paper-200/70 hover:text-ink-900 dark:hover:text-paper-50'
+                }`
+              }
+            >
+              about
+            </NavLink>
+          </li>
         </ul>
 
         <div className="flex items-center gap-3">
@@ -52,21 +58,30 @@ export default function Navbar({ theme, toggleTheme }) {
 
       {/* mobile nav */}
       <ul className="sm:hidden flex overflow-x-auto gap-1 px-4 pb-3 font-mono text-xs">
-        {links.map((link) => (
-          <li key={link.to}>
-            <NavLink
-              to={link.to}
-              end={link.to === '/'}
-              className={({ isActive }) =>
-                `prompt px-2.5 py-1.5 rounded-md whitespace-nowrap ${
-                  isActive ? 'text-amber' : 'text-ink-600 dark:text-paper-200/70'
-                }`
-              }
+        {sectionLinks.map((link) => (
+          <li key={link.href}>
+            <a
+              href={link.href}
+              className="prompt px-2.5 py-1.5 rounded-md whitespace-nowrap transition-colors text-ink-600 dark:text-paper-200/70 hover:text-ink-900 dark:hover:text-paper-50"
             >
               {link.label}
-            </NavLink>
+            </a>
           </li>
         ))}
+        <li>
+          <NavLink
+            to="/about"
+            className={({ isActive }) =>
+              `prompt px-2.5 py-1.5 rounded-md whitespace-nowrap transition-colors ${
+                isActive
+                  ? 'text-amber'
+                  : 'text-ink-600 dark:text-paper-200/70 hover:text-ink-900 dark:hover:text-paper-50'
+              }`
+            }
+          >
+            about
+          </NavLink>
+        </li>
       </ul>
     </header>
   )

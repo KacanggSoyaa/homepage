@@ -21,4 +21,25 @@ export const certificates = [
     date: '2024',
     link: '#',
   },
+  {
+    id: 4,
+    name: 'Certificate Name',
+    issuer: 'Issuing Organization',
+    date: '2024',
+    link: '#',
+  },
+  {
+    id: 5,
+    name: 'Certificate Name',
+    issuer: 'Issuing Organization',
+    date: '2024',
+    link: '#',
+  },
+  {
+    id: 6,
+    name: 'Certificate Name',
+    issuer: 'Issuing Organization',
+    date: '2024',
+    link: '#',
+  },
 ]

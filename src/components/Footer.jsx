@@ -1,4 +1,4 @@
-import { GithubIcon, LinkedinIcon, MailIcon } from './Icons.jsx'
+import { GithubIcon, LinkedinIcon, MailIcon, InstagramIcon } from './Icons.jsx'
 
 export default function Footer() {
   const year = new Date().getFullYear()
@@ -9,14 +9,17 @@ export default function Footer() {
           © {year} Danis Nazri — built with React
         </p>
         <div className="flex items-center gap-4 text-ink-600 dark:text-paper-200/70">
-          <a href="#" aria-label="GitHub" className="hover:text-amber transition-colors">
+          <a href="https://github.com/KacanggSoyaa" aria-label="GitHub" className="hover:text-amber transition-colors">
             <GithubIcon />
           </a>
           <a href="#" aria-label="LinkedIn" className="hover:text-amber transition-colors">
             <LinkedinIcon />
           </a>
-          <a href="#" aria-label="Email" className="hover:text-amber transition-colors">
+          <a href="mailto:kacanggsoyaa18@gmail.com" aria-label="Email" className="hover:text-amber transition-colors">
             <MailIcon />
+          </a>
+          <a href="https://www.instagram.com/dnazzry_" aria-label="Instagram" className="hover:text-amber transition-colors">
+            <InstagramIcon />
           </a>
         </div>
       </div>

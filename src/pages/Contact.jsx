@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { GithubIcon, LinkedinIcon, MailIcon } from '../components/Icons.jsx'
+import { GithubIcon, LinkedinIcon, MailIcon, InstagramIcon } from '../components/Icons.jsx'
 
 export default function Contact() {
   const [form, setForm] = useState({ name: '', email: '', message: '' })
@@ -18,7 +18,7 @@ export default function Contact() {
   }
 
   return (
-    <section className="container-page py-16 sm:py-20 max-w-2xl">
+    <section id="contact" className="container-page py-16 sm:py-20 max-w-2xl">
       <p className="prompt font-mono text-sm text-amber mb-2">contact</p>
       <h1 className="text-3xl font-mono font-semibold mb-3">Let's talk</h1>
       <p className="text-ink-700 dark:text-paper-200/80 mb-10">
@@ -26,14 +26,17 @@ export default function Contact() {
       </p>
 
       <div className="flex items-center gap-5 mb-10">
-        <a href="#" className="flex items-center gap-2 font-mono text-sm text-ink-700 dark:text-paper-200/80 hover:text-amber transition-colors">
+        <a href="mailto:kacanggsoyaa18@gmail.com" className="flex items-center gap-2 font-mono text-sm text-ink-700 dark:text-paper-200/80 hover:text-amber transition-colors">
           <MailIcon /> email
         </a>
-        <a href="#" className="flex items-center gap-2 font-mono text-sm text-ink-700 dark:text-paper-200/80 hover:text-amber transition-colors">
+        <a href="https://github.com/KacanggSoyaa" className="flex items-center gap-2 font-mono text-sm text-ink-700 dark:text-paper-200/80 hover:text-amber transition-colors">
           <GithubIcon width="18" height="18" /> github
         </a>
         <a href="#" className="flex items-center gap-2 font-mono text-sm text-ink-700 dark:text-paper-200/80 hover:text-amber transition-colors">
           <LinkedinIcon width="18" height="18" /> linkedin
+        </a>
+        <a href="https://www.instagram.com/dnazzry_" className="flex items-center gap-2 font-mono text-sm text-ink-700 dark:text-paper-200/80 hover:text-amber transition-colors">
+          <InstagramIcon width="18" height="18" /> instagram
         </a>
       </div>
 

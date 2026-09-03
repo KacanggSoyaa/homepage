@@ -3,7 +3,7 @@ import CertificateCard from '../components/CertificateCard.jsx'
 
 export default function Certificates() {
   return (
-    <section className="container-page py-16 sm:py-20">
+    <section id="certificates" className="container-page py-16 sm:py-20">
       <p className="prompt font-mono text-sm text-amber mb-2">certificates</p>
       <h1 className="text-3xl font-mono font-semibold mb-3">Certifications</h1>
       <p className="text-ink-700 dark:text-paper-200/80 max-w-xl mb-10">

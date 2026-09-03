@@ -61,4 +61,13 @@
       animation: none;
     }
   }
+
+  .animate-marquee-inline {
+    animation: marquee-inline 10s linear infinite;
+  }
+
+  @keyframes marquee-inline {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
 }

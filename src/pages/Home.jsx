@@ -1,12 +1,11 @@
-import { Link } from 'react-router-dom'
 import { skillGroups } from '../data/skills.js'
 import { projects } from '../data/projects.js'
 import { certificates } from '../data/certificates.js'
+import ShootingStars from '../components/ShootingStars.jsx'
 
 const allSkills = skillGroups.flatMap((g) => g.items)
 const languageCount = skillGroups.find((g) => g.label === 'Languages')?.items.length ?? 0
 
-// TODO: adjust once your real project/certificate/experience counts are set
 const stats = [
   { value: `${languageCount}+`, label: 'Languages' },
   { value: `${projects.length}+`, label: 'Projects' },
@@ -17,7 +16,10 @@ const stats = [
 export default function Home() {
   return (
     <>
-      <section className="container-page pt-16 sm:pt-24 pb-10 grid lg:grid-cols-2 gap-14 items-center">
+      <ShootingStars />
+
+      {/* Hero Section */}
+      <section id="home" className="container-page pt-16 sm:pt-24 pb-10 grid lg:grid-cols-2 gap-14 items-center relative z-10">
         <div>
           <p className="font-mono text-sm text-amber mb-4">
             $ whoami<span className="caret" />
@@ -37,18 +39,18 @@ export default function Home() {
           </p>
 
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link
-              to="/projects"
+            <a
+              href="#projects"
               className="px-5 py-2.5 rounded-md bg-amber text-ink-950 font-mono text-sm font-medium hover:bg-amber-light transition-colors"
             >
               View projects
-            </Link>
-            <Link
-              to="/contact"
+            </a>
+            <a
+              href="#contact"
               className="px-5 py-2.5 rounded-md border border-ink-200/25 dark:border-paper-50/15 font-mono text-sm hover:border-amber/60 hover:text-amber transition-colors"
             >
               Get in touch
-            </Link>
+            </a>
           </div>
         </div>
 
@@ -69,26 +71,13 @@ export default function Home() {
               {'  '}<span className="text-teal">"role"</span>: <span className="text-amber">"Software & App Developer"</span>,{'\n'}
               {'  '}<span className="text-teal">"location"</span>: <span className="text-amber">"Kuala Lumpur, MY"</span>,{'\n'}
               {'  '}<span className="text-teal">"stack"</span>: [<span className="text-amber">"React"</span>, <span className="text-amber">"Node"</span>, <span className="text-amber">"MySQL"</span>],{'\n'}
-              {'  '}<span className="text-teal">"status"</span>: <span className="text-amber">"open to opportunities"</span>{'\n'}
+              {'  '}<span className="text-teal">"status"</span>: <span className="text-amber">"open to opportunities"</span>,{'\n'}
+              {'  '}<span className="text-teal">"Languages"</span>: <span className="inline-block overflow-hidden max-w-[200px] align-bottom"><span className="inline-block whitespace-nowrap animate-marquee-inline">{allSkills.map((s, i) => <span key={i} className="text-amber">{i > 0 ? ', ' : '"'}{s}</span>)}"</span></span>{'\n'}
               <span className="text-ink-600 dark:text-paper-200/50">{'}'}</span>
             </code>
           </pre>
         </div>
       </section>
-
-      {/* skills marquee strip */}
-      <div className="border-y border-ink-200/10 dark:border-paper-50/5 py-6 overflow-hidden">
-        <div className="flex w-max marquee-track">
-          {[...allSkills, ...allSkills].map((skill, i) => (
-            <span
-              key={`${skill}-${i}`}
-              className="font-mono text-sm text-ink-600 dark:text-paper-200/50 px-8 whitespace-nowrap"
-            >
-              {skill}
-            </span>
-          ))}
-        </div>
-      </div>
 
       {/* stats row */}
       <section className="container-page py-14 sm:py-16 grid grid-cols-2 sm:grid-cols-4 gap-8">

@@ -2,13 +2,9 @@ import { useEffect, useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar.jsx'
 import Footer from './components/Footer.jsx'
-import Home from './pages/Home.jsx'
 import About from './pages/About.jsx'
-import Projects from './pages/Projects.jsx'
-import Certificates from './pages/Certificates.jsx'
-import Contact from './pages/Contact.jsx'
 
-export default function App() {
+export default function App({ sections }) {
   const [theme, setTheme] = useState(() => {
     const saved = localStorage.getItem('theme')
     return saved || 'dark'
@@ -24,6 +20,14 @@ export default function App() {
     localStorage.setItem('theme', theme)
   }, [theme])
 
+  useEffect(() => {
+    const hash = window.location.hash
+    if (hash) {
+      const el = document.getElementById(hash.slice(1))
+      if (el) el.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [])
+
   const toggleTheme = () => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))
 
   return (
@@ -31,11 +35,17 @@ export default function App() {
       <Navbar theme={theme} toggleTheme={toggleTheme} />
       <main className="flex-1">
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route
+            path="/"
+            element={
+              <>
+                {sections.map(({ id, Component }) => (
+                  <Component key={id} />
+                ))}
+              </>
+            }
+          />
           <Route path="/about" element={<About />} />
-          <Route path="/projects" element={<Projects />} />
-          <Route path="/certificates" element={<Certificates />} />
-          <Route path="/contact" element={<Contact />} />
         </Routes>
       </main>
       <Footer />
