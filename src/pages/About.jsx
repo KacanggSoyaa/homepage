@@ -1,3 +1,7 @@
+// About.jsx — the "A bit about me" page on the "/about" route.
+// Displays a bio, skill groups (loaded from data/skills.js), and an education
+// section. Skills render as bordered pill badges grouped by category label.
+
 import { skillGroups } from '../data/skills.js'
 
 export default function About() {

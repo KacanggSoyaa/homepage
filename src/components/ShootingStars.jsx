@@ -1,7 +1,10 @@
+// ShootingStars.jsx — animated canvas background.
+// Renders a full-screen <canvas> with amber "shooting stars" that spawn,
+// travel at a 45-degree angle leaving fading trails, and clean up off-screen.
+// It uses requestAnimationFrame and cleans up its listeners on unmount.
+
 import { useEffect, useRef } from 'react'
 
-// ShootingStars renders a full-screen canvas with animated amber shooting stars.
-// It runs a requestAnimationFrame loop and cleans up on unmount.
 export default function ShootingStars() {
   // Ref to the <canvas> DOM element
   const canvasRef = useRef(null)

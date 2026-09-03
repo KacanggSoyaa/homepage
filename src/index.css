@@ -1,22 +1,84 @@
 /* ============================================================
-   Tailwind CSS layers — these imports load Tailwind's built-in
-   base styles, component utilities, and utility classes.
+   MAIN STYLESHEET — Tailwind CSS v4 (CSS-first configuration).
+
+   Tailwind v4 replaces the old JavaScript config files
+   (tailwind.config.js / postcss.config.js) with CSS configuration
+   using the @theme directive. All design tokens below define the
+   palette, fonts, and spacing used across the site and are
+   automatically converted into Tailwind utility classes.
+
+   How utilities work here:
+     - Colors like `bg-ink-900`, `text-paper-50`, `text-amber` come
+       from the `--color-*` tokens below.
+     - Fonts `font-mono` / `font-sans` come from `--font-*` tokens.
+     - `max-w-content` comes from the `--max-width-content` token.
    ============================================================ */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+
+/* Load Tailwind's base styles, components, and utility layers */
+@import "tailwindcss";
 
 /* ============================================================
-   Base layer — global styles applied to HTML elements.
-   These sit below component styles in specificity.
+   Dark-mode variant (class-based).
+   Tailwind v4's default `dark:` variant follows the OS color-scheme
+   preference (prefers-color-scheme). This site instead toggles a `.dark`
+   class on the <html> element via the theme switch, so we override the
+   variant so `dark:` utilities apply only when .dark is present on an
+   ancestor. This preserves the original class-based dark/light toggle.
+   ============================================================ */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ============================================================
+   @theme — Design tokens (Tailwind v4 CSS-first configuration).
+
+   These replace the `theme.extend` block that used to live in
+   tailwind.config.js. Each variable generates matching utilities.
+   ============================================================ */
+@theme {
+  /* --font-* tokens power the `font-mono` and `font-sans` utilities.
+     IBM Plex Mono is used for code-style text, IBM Plex Sans for body. */
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+
+  /* --color-* tokens power text/bg/border color utilities.
+     "ink" = dark greys (used for the dark theme),
+     "paper" = light greys/whites (used for the light theme),
+     "amber" and "teal" are the two accent colors. */
+  --color-ink-950: #0F1117;
+  --color-ink-900: #12141C;
+  --color-ink-800: #1A1D29;
+  --color-ink-700: #242836;
+  --color-ink-600: #333849;
+
+  --color-paper-50: #F3F5F7;
+  --color-paper-100: #FFFFFF;
+  --color-paper-200: #E4E7EC;
+
+  --color-amber: #E8A33D;
+  --color-amber-light: #F0B85F;
+  --color-amber-dark: #C4832A;
+
+  --color-teal: #5EC8C0;
+  --color-teal-light: #7FD6CF;
+
+  /* --max-width-* token powers the `max-w-content` utility
+     (a centered page container used across every section). */
+  --max-width-content: 72rem;
+}
+
+/* ============================================================
+   @layer base — Global styles applied to raw HTML elements.
+
+   These sit at low specificity so component/utility classes can
+   override them. @apply inlines the referenced utility styles.
    ============================================================ */
 @layer base {
-  /* Enable smooth scrolling for anchor links across the site */
+  /* Enable smooth scrolling for in-page anchor links (e.g. #projects) */
   html {
     scroll-behavior: smooth;
   }
 
-  /* Set default body colors and font based on the current theme (dark/light).
+  /* Default body colors + font based on the current theme (dark/light).
+     The `dark:` variants swap colors when the <html> has class="dark".
      transition-colors makes theme switches animate smoothly. */
   body {
     @apply bg-paper-50 text-ink-900 dark:bg-ink-900 dark:text-paper-50 font-sans transition-colors duration-300;
@@ -35,66 +97,77 @@
 }
 
 /* ============================================================
-   Utility layer — custom utility classes used across components.
+   Custom utilities — defined with @utility so they can be used
+   with variants (e.g. dark:prompt) just like built-in utilities.
    ============================================================ */
-@layer utilities {
-  /* Centered page container with horizontal padding and a max-width.
-     Used on almost every section to keep content aligned. */
-  .container-page {
-    @apply max-w-content mx-auto px-6 sm:px-8;
-  }
 
-  /* Adds a "~/ " prefix before text in amber color.
-     Used on nav links and section headings to mimic a terminal prompt. */
-  .prompt::before {
-    content: '~/';
+/* Centered page container with horizontal padding and a max-width.
+   Used on almost every section to keep content aligned. */
+@utility container-page {
+  @apply max-w-content mx-auto px-6 sm:px-8;
+}
+
+/* Adds a "~/ " prefix before text in amber color.
+   Used on nav links and section headings to mimic a terminal prompt. */
+@utility prompt {
+  &::before {
+    content: "~/";
     @apply text-amber/70 dark:text-amber/60 mr-1;
   }
+}
 
-  /* Blinking cursor animation for the "$ whoami" prompt on the home hero.
-     Simulates a terminal cursor with a 1-second blink cycle. */
-  .caret {
-    display: inline-block;
-    width: 0.55ch;
-    background: currentColor;
-    margin-left: 2px;
-    animation: blink 1s steps(1) infinite;
+/* Blinking cursor animation for the "$ whoami" prompt on the home hero.
+   Simulates a terminal cursor with a 1-second blink cycle. */
+@utility caret {
+  display: inline-block;
+  width: 0.55ch;
+  background: currentColor;
+  margin-left: 2px;
+  animation: blink 1s steps(1) infinite;
+}
+
+/* The blink keyframes used by the .caret utility above */
+@keyframes blink {
+  50% {
+    opacity: 0;
   }
+}
 
-  @keyframes blink {
-    50% { opacity: 0; }
-  }
+/* Horizontal scrolling marquee used for the skills ticker in the hero panel.
+   Moves content left continuously over 22 seconds, pauses on hover.
+   The nested @media keeps the animation off for users who prefer reduced motion. */
+@utility marquee-track {
+  animation: marquee 22s linear infinite;
 
-  /* Horizontal scrolling marquee used for the skills ticker in the hero panel.
-     Moves content left continuously over 22 seconds, pauses on hover. */
-  .marquee-track {
-    animation: marquee 22s linear infinite;
-  }
-
-  .marquee-track:hover {
+  &:hover {
     animation-play-state: paused;
   }
 
-  @keyframes marquee {
-    from { transform: translateX(0); }
-    to { transform: translateX(-50%); }
-  }
-
-  /* Disable marquee animation for users who prefer reduced motion */
   @media (prefers-reduced-motion: reduce) {
-    .marquee-track {
-      animation: none;
-    }
+    animation: none;
   }
+}
 
-  /* Shorter marquee animation used inline in the hero JSON panel.
-     Scrolls the "Languages" field value across 10 seconds. */
-  .animate-marquee-inline {
-    animation: marquee-inline 10s linear infinite;
+@keyframes marquee {
+  from {
+    transform: translateX(0);
   }
+  to {
+    transform: translateX(-50%);
+  }
+}
 
-  @keyframes marquee-inline {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
+/* Shorter marquee animation used inline in the hero JSON panel.
+   Scrolls the "Languages" field value across 10 seconds. */
+@utility animate-marquee-inline {
+  animation: marquee-inline 10s linear infinite;
+}
+
+@keyframes marquee-inline {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
   }
 }

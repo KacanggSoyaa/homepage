@@ -1,3 +1,7 @@
+// Certificates.jsx — the certifications grid section (anchored at #certificates).
+// Loads certificate data from data/certificates.js and renders each one as a
+// CertificateCard in a responsive 1/2/3-column grid.
+
 import { certificates } from '../data/certificates.js'
 import CertificateCard from '../components/CertificateCard.jsx'
 

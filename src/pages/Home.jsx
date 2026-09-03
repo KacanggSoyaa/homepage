@@ -1,3 +1,8 @@
+// Home.jsx — the main landing section rendered on the "/" route.
+// Contains a full-screen animated shooting-star background, a hero section
+// (name, title, bio, CTAs) with a mock terminal/JSON "profile" panel, and a
+// row of stats (languages, projects, certificates) derived from the data files.
+
 import { skillGroups } from '../data/skills.js'
 import { projects } from '../data/projects.js'
 import { certificates } from '../data/certificates.js'

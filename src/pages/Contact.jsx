@@ -1,3 +1,8 @@
+// Contact.jsx — the contact section (anchored at #contact).
+// Shows quick links (email/social) and a contact form. The form currently
+// only logs submissions to the console — connect a backend service (e.g.
+// Formspree or EmailJS) to actually deliver messages.
+
 import { useState } from 'react'
 import { GithubIcon, LinkedinIcon, MailIcon, InstagramIcon } from '../components/Icons.jsx'
 

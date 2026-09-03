@@ -1,3 +1,6 @@
+// Footer.jsx — site-wide footer.
+// Shows a copyright notice on the left and social media icon links on the right.
+
 import { GithubIcon, LinkedinIcon, MailIcon, InstagramIcon } from './Icons.jsx'
 
 export default function Footer() {

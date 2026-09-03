@@ -1,7 +1,8 @@
+// CertificateCard.jsx — displays a single certificate in the certificates grid.
+// Props: { certificate } — an object with name, issuer, date, and link.
+
 import { AwardIcon, ExternalLinkIcon } from './Icons.jsx'
 
-// CertificateCard displays a single certificate in the certificates grid.
-// Props: { certificate } — an object with name, issuer, date, and link.
 export default function CertificateCard({ certificate }) {
   return (
     // Card with border that highlights amber on hover

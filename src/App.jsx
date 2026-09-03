@@ -1,3 +1,7 @@
+// App.jsx — root layout component.
+// Renders the site chrome (Navbar + Footer) around the routed page content.
+// It owns the dark/light theme state and smooth-scroll behavior for anchors.
+
 import { useEffect, useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar.jsx'
@@ -7,14 +11,18 @@ import About from './pages/About.jsx'
 // App is the root component. It receives the `sections` array from main.jsx
 // and renders them on the "/" route. About stays on its own "/about" route.
 export default function App({ sections }) {
+  // ------------------------------------------------------------
   // Theme state: reads from localStorage on first render, defaults to "dark".
-  // Stored as "dark" | "light" and synced to the <html> class for Tailwind dark mode.
+  // The value is either "dark" or "light" and is synced to the <html> class
+  // so Tailwind's dark-mode variant (`dark:`) knows which theme is active.
+  // ------------------------------------------------------------
   const [theme, setTheme] = useState(() => {
     const saved = localStorage.getItem('theme')
     return saved || 'dark'
   })
 
-  // Sync the dark/light class on <html> whenever theme changes, and persist to localStorage.
+  // Whenever the theme changes, add/remove the "dark" class on <html>
+  // and persist the choice to localStorage so it survives page reloads.
   useEffect(() => {
     const root = document.documentElement
     if (theme === 'dark') {
@@ -26,7 +34,8 @@ export default function App({ sections }) {
   }, [theme])
 
   // On initial page load, if the URL contains a hash (e.g. /#projects),
-  // smooth-scroll to that section after the DOM is ready.
+  // smooth-scroll to that section once the DOM is ready so users landing
+  // on a deep-linked section start at the right place.
   useEffect(() => {
     const hash = window.location.hash
     if (hash) {
@@ -35,19 +44,21 @@ export default function App({ sections }) {
     }
   }, [])
 
-  // Toggle between dark and light themes.
+  // Flip between dark and light themes (used by the navbar toggle).
   const toggleTheme = () => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))
 
   return (
+    // Outer wrapper: min-h-screen + flex column keeps the footer pinned to
+    // the bottom even on short pages, with main filling the middle.
     <div className="min-h-screen flex flex-col">
-      {/* Sticky navbar at the top of every page */}
+      {/* Sticky navigation bar shown at the top of every page */}
       <Navbar theme={theme} toggleTheme={toggleTheme} />
 
-      {/* Main content area fills remaining vertical space */}
+      {/* Main content area — flex-1 makes it expand to push the footer down */}
       <main className="flex-1">
         <Routes>
-          {/* Home route: renders all sections from the sections array stacked vertically.
-              A horizontal divider (<hr>) is placed between each section. */}
+          {/* Home route: renders all sections from the `sections` array
+              stacked vertically, with a horizontal divider between them. */}
           <Route
             path="/"
             element={
@@ -64,7 +75,7 @@ export default function App({ sections }) {
               </>
             }
           />
-          {/* About page is on its own route, separate from the main scroll */}
+          {/* About page lives on its own route, separate from the main scroll */}
           <Route path="/about" element={<About />} />
         </Routes>
       </main>

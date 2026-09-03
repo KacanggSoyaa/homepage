@@ -1,7 +1,8 @@
+// ProjectCard.jsx — displays a single project in the projects grid.
+// Props: { project } — an object with title, description, stack, github, and demo.
+
 import { GithubIcon, ExternalLinkIcon } from './Icons.jsx'
 
-// ProjectCard displays a single project in the projects grid.
-// Props: { project } — an object with title, description, stack, github, and demo.
 export default function ProjectCard({ project }) {
   return (
     // Card with border that highlights amber on hover

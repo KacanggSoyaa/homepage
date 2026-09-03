@@ -1,5 +1,7 @@
-// Projects data: array of project objects displayed in the Projects section.
-// Each project has: id (unique key), title, description, stack (tech used), github (repo URL), demo (live URL).
+// projects.js — Projects data.
+// Array of project objects displayed in the Projects section.
+// Each project has: id (unique key), title, description, stack (tech used),
+// github (repo URL), demo (live URL).
 // TODO: replace these placeholders with your real projects.
 export const projects = [
   {

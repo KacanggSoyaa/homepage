@@ -1,5 +1,6 @@
-// SVG icon components used throughout the site (social links, UI elements).
-// All icons accept spread props (width, height, className, etc.) for customization.
+// Icons.jsx — SVG icon components used throughout the site (social links, UI).
+// All icons accept spread props (width, height, className, etc.) for customization,
+// so they can be resized/recolored per usage.
 
 // GitHub logo — filled path, default 20x20
 export const GithubIcon = (props) => (

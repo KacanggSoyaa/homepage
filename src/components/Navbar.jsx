@@ -1,3 +1,7 @@
+// Navbar.jsx — sticky top navigation bar.
+// Shows the brand logo, section links + About link, and a theme toggle.
+// Renders a horizontal desktop menu (≥640px) and a scrollable mobile bar.
+
 import { NavLink } from 'react-router-dom'
 import { SunIcon, MoonIcon } from './Icons.jsx'
 

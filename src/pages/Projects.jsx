@@ -1,3 +1,7 @@
+// Projects.jsx — the projects grid section (anchored at #projects).
+// Loads project data from data/projects.js and renders each one as a
+// ProjectCard in a responsive 1/2/3-column grid.
+
 import { projects } from '../data/projects.js'
 import ProjectCard from '../components/ProjectCard.jsx'
 
