@@ -42,6 +42,7 @@
   /* --color-* tokens power text/bg/border color utilities.
      "ink" = dark greys (used for the dark theme),
      "paper" = light greys/whites (used for the light theme),
+     "space" = near-black deep-space background (used for the space theme),
      "amber" and "teal" are the two accent colors. */
   --color-ink-950: #0F1117;
   --color-ink-900: #12141C;
@@ -52,6 +53,11 @@
   --color-paper-50: #F3F5F7;
   --color-paper-100: #FFFFFF;
   --color-paper-200: #E4E7EC;
+
+  /* Deep-space black for the dark-mode background */
+  --color-space-950: #03040A;
+  --color-space-900: #05070F;
+  --color-space-800: #0A0E1A;
 
   --color-amber: #E8A33D;
   --color-amber-light: #F0B85F;
@@ -78,10 +84,20 @@
   }
 
   /* Default body colors + font based on the current theme (dark/light).
-     The `dark:` variants swap colors when the <html> has class="dark".
+     In dark mode the background is deep space black (space-950) so the
+     glowing moon, sun, and stars in SpaceBackground stand out clearly.
+     A faint radial tint adds depth to the otherwise flat black void.
      transition-colors makes theme switches animate smoothly. */
   body {
-    @apply bg-paper-50 text-ink-900 dark:bg-ink-900 dark:text-paper-50 font-sans transition-colors duration-300;
+    @apply bg-paper-50 text-ink-900 dark:bg-space-950 dark:text-paper-50 font-sans transition-colors duration-300;
+  }
+
+  /* Dark-mode background depth: a very subtle blue/purple radial tint that
+     sits behind the canvas animation, giving the sky a slight gradient. */
+  .dark body {
+    background-image:
+      radial-gradient(60rem 40rem at 80% 10%, rgba(80, 90, 180, 0.12), transparent 60%),
+      radial-gradient(50rem 40rem at 15% 90%, rgba(120, 80, 200, 0.10), transparent 60%);
   }
 
   /* Highlight selected text with a semi-transparent amber tint */
@@ -170,4 +186,24 @@
   100% {
     transform: translateX(-50%);
   }
+}
+
+/* ============================================================
+   Glow utilities — give text/elements a soft neon "space light" glow.
+   These are only meaningful in dark mode where the glow is visible.
+   ============================================================ */
+
+/* Amber text glow — used on headings/keywords (e.g. hero name, section titles) */
+@utility text-glow-amber {
+  text-shadow: 0 0 8px rgba(232, 163, 61, 0.55), 0 0 24px rgba(232, 163, 61, 0.35);
+}
+
+/* Teal text glow — used on secondary accents */
+@utility text-glow-teal {
+  text-shadow: 0 0 8px rgba(94, 200, 192, 0.55), 0 0 24px rgba(94, 200, 192, 0.35);
+}
+
+/* Soft white text glow — used on large headings (space-like) */
+@utility text-glow-white {
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.45);
 }

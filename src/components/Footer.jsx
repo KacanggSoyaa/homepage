@@ -8,8 +8,9 @@ export default function Footer() {
   const year = new Date().getFullYear()
 
   return (
-    // Site-wide footer with a top border line and social icon links
-    <footer className="border-t border-ink-200/10 dark:border-paper-50/5 mt-24">
+    // Site-wide footer with a top border line and social icon links.
+    // relative + z-10 keeps it above the fixed space background.
+    <footer className="relative z-10 border-t border-ink-200/10 dark:border-paper-50/5 mt-24">
       <div className="container-page py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
         {/* Copyright text on the left */}
         <p className="font-mono text-xs text-ink-600 dark:text-paper-200/60">

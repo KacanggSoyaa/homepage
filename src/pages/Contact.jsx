@@ -5,6 +5,7 @@
 
 import { useState } from 'react'
 import { GithubIcon, LinkedinIcon, MailIcon, InstagramIcon } from '../components/Icons.jsx'
+import ScrollReveal from '../components/ScrollReveal.jsx'
 
 export default function Contact() {
   // Form state: tracks the current values of name, email, and message fields.
@@ -32,93 +33,99 @@ export default function Contact() {
     // Section with id="contact" for anchor scrolling from the navbar
     <section id="contact" className="container-page py-16 sm:py-20 max-w-2xl">
       {/* Section heading with terminal-style "~/contact" prompt */}
-      <p className="prompt font-mono text-sm text-amber mb-2">contact</p>
-      <h1 className="text-3xl font-mono font-semibold mb-3">Let's talk</h1>
-      <p className="text-ink-700 dark:text-paper-200/80 mb-10">
-        Reach out directly, or send a message below.
-      </p>
+      <ScrollReveal>
+        <p className="prompt font-mono text-sm text-amber mb-2 dark:text-amber">contact</p>
+        <h1 className="text-3xl font-mono font-semibold mb-3 dark:text-glow-amber">Let's talk</h1>
+        <p className="text-ink-700 dark:text-paper-200/80 mb-10">
+          Reach out directly, or send a message below.
+        </p>
+      </ScrollReveal>
 
       {/* Social media / email quick-links row */}
-      <div className="flex items-center gap-5 mb-10">
-        <a href="mailto:kacanggsoyaa18@gmail.com" className="flex items-center gap-2 font-mono text-sm text-ink-700 dark:text-paper-200/80 hover:text-amber transition-colors">
-          <MailIcon /> email
-        </a>
-        <a href="https://github.com/KacanggSoyaa" className="flex items-center gap-2 font-mono text-sm text-ink-700 dark:text-paper-200/80 hover:text-amber transition-colors">
-          <GithubIcon width="18" height="18" /> github
-        </a>
-        <a href="#" className="flex items-center gap-2 font-mono text-sm text-ink-700 dark:text-paper-200/80 hover:text-amber transition-colors">
-          <LinkedinIcon width="18" height="18" /> linkedin
-        </a>
-        <a href="https://www.instagram.com/dnazzry_" className="flex items-center gap-2 font-mono text-sm text-ink-700 dark:text-paper-200/80 hover:text-amber transition-colors">
-          <InstagramIcon width="18" height="18" /> instagram
-        </a>
-      </div>
+      <ScrollReveal delay={100}>
+        <div className="flex flex-wrap items-center gap-5 mb-10">
+          <a href="mailto:kacanggsoyaa18@gmail.com" className="flex items-center gap-2 font-mono text-sm text-ink-700 dark:text-paper-200/80 hover:text-amber transition-colors">
+            <MailIcon /> email
+          </a>
+          <a href="https://github.com/KacanggSoyaa" className="flex items-center gap-2 font-mono text-sm text-ink-700 dark:text-paper-200/80 hover:text-amber transition-colors">
+            <GithubIcon width="18" height="18" /> github
+          </a>
+          <a href="#" className="flex items-center gap-2 font-mono text-sm text-ink-700 dark:text-paper-200/80 hover:text-amber transition-colors">
+            <LinkedinIcon width="18" height="18" /> linkedin
+          </a>
+          <a href="https://www.instagram.com/dnazzry_" className="flex items-center gap-2 font-mono text-sm text-ink-700 dark:text-paper-200/80 hover:text-amber transition-colors">
+            <InstagramIcon width="18" height="18" /> instagram
+          </a>
+        </div>
+      </ScrollReveal>
 
       {/* Contact form with name, email, and message fields */}
-      <form onSubmit={handleSubmit} className="space-y-5">
-        {/* Name input field */}
-        <div>
-          <label htmlFor="name" className="font-mono text-xs text-ink-600 dark:text-paper-200/60">
-            name
-          </label>
-          <input
-            id="name"
-            name="name"
-            type="text"
-            required
-            value={form.name}
-            onChange={handleChange}
-            className="mt-1.5 w-full rounded-md border border-ink-200/20 dark:border-paper-50/15 bg-transparent px-3.5 py-2.5 text-sm focus:border-amber/60 outline-none transition-colors"
-          />
-        </div>
+      <ScrollReveal delay={200}>
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Name input field */}
+          <div>
+            <label htmlFor="name" className="font-mono text-xs text-ink-600 dark:text-paper-200/60">
+              name
+            </label>
+            <input
+              id="name"
+              name="name"
+              type="text"
+              required
+              value={form.name}
+              onChange={handleChange}
+              className="mt-1.5 w-full rounded-md border border-ink-200/20 dark:border-paper-50/15 bg-transparent px-3.5 py-2.5 text-sm focus:border-amber/60 outline-none transition-colors"
+            />
+          </div>
 
-        {/* Email input field */}
-        <div>
-          <label htmlFor="email" className="font-mono text-xs text-ink-600 dark:text-paper-200/60">
-            email
-          </label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            required
-            value={form.email}
-            onChange={handleChange}
-            className="mt-1.5 w-full rounded-md border border-ink-200/20 dark:border-paper-50/15 bg-transparent px-3.5 py-2.5 text-sm focus:border-amber/60 outline-none transition-colors"
-          />
-        </div>
+          {/* Email input field */}
+          <div>
+            <label htmlFor="email" className="font-mono text-xs text-ink-600 dark:text-paper-200/60">
+              email
+            </label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              required
+              value={form.email}
+              onChange={handleChange}
+              className="mt-1.5 w-full rounded-md border border-ink-200/20 dark:border-paper-50/15 bg-transparent px-3.5 py-2.5 text-sm focus:border-amber/60 outline-none transition-colors"
+            />
+          </div>
 
-        {/* Message textarea */}
-        <div>
-          <label htmlFor="message" className="font-mono text-xs text-ink-600 dark:text-paper-200/60">
-            message
-          </label>
-          <textarea
-            id="message"
-            name="message"
-            rows="5"
-            required
-            value={form.message}
-            onChange={handleChange}
-            className="mt-1.5 w-full rounded-md border border-ink-200/20 dark:border-paper-50/15 bg-transparent px-3.5 py-2.5 text-sm focus:border-amber/60 outline-none transition-colors resize-none"
-          />
-        </div>
+          {/* Message textarea */}
+          <div>
+            <label htmlFor="message" className="font-mono text-xs text-ink-600 dark:text-paper-200/60">
+              message
+            </label>
+            <textarea
+              id="message"
+              name="message"
+              rows="5"
+              required
+              value={form.message}
+              onChange={handleChange}
+              className="mt-1.5 w-full rounded-md border border-ink-200/20 dark:border-paper-50/15 bg-transparent px-3.5 py-2.5 text-sm focus:border-amber/60 outline-none transition-colors resize-none"
+            />
+          </div>
 
-        {/* Submit button */}
-        <button
-          type="submit"
-          className="px-5 py-2.5 rounded-md bg-amber text-ink-950 font-mono text-sm font-medium hover:bg-amber-light transition-colors"
-        >
-          Send message
-        </button>
+          {/* Submit button */}
+          <button
+            type="submit"
+            className="px-5 py-2.5 rounded-md bg-amber text-ink-950 font-mono text-sm font-medium hover:bg-amber-light hover:shadow-lg hover:shadow-amber/25 transition-all"
+          >
+            Send message
+          </button>
 
-        {/* Confirmation message shown after form submission */}
-        {sent && (
-          <p className="font-mono text-sm text-teal">
-            Message logged to console — connect a backend to actually send it.
-          </p>
-        )}
-      </form>
+          {/* Confirmation message shown after form submission */}
+          {sent && (
+            <p className="font-mono text-sm text-teal">
+              Message logged to console — connect a backend to actually send it.
+            </p>
+          )}
+        </form>
+      </ScrollReveal>
     </section>
   )
 }

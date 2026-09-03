@@ -5,8 +5,11 @@ import { AwardIcon, ExternalLinkIcon } from './Icons.jsx'
 
 export default function CertificateCard({ certificate }) {
   return (
-    // Card with border that highlights amber on hover
-    <article className="border border-ink-200/15 dark:border-paper-50/10 rounded-lg p-6 flex flex-col gap-4 hover:border-amber/50 transition-colors">
+    // Card with border that highlights amber on hover.
+    // A translucent dark backdrop in dark mode keeps text readable over the
+    // animated space background. Hover lifts the card + adds a soft shadow for
+    // a more polished, tactile feel.
+    <article className="border border-ink-200/15 dark:border-paper-50/10 dark:bg-space-900/60 dark:backdrop-blur-sm rounded-lg p-6 flex flex-col gap-4 hover:border-amber/50 transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-amber/10">
       {/* Amber-tinted award icon in a rounded square */}
       <div className="w-12 h-12 rounded-md flex items-center justify-center bg-amber/10 text-amber">
         <AwardIcon />

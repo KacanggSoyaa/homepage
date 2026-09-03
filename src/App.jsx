@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar.jsx'
 import Footer from './components/Footer.jsx'
+import SpaceBackground from './components/SpaceBackground.jsx'
 import About from './pages/About.jsx'
 
 // App is the root component. It receives the `sections` array from main.jsx
@@ -50,12 +51,18 @@ export default function App({ sections }) {
   return (
     // Outer wrapper: min-h-screen + flex column keeps the footer pinned to
     // the bottom even on short pages, with main filling the middle.
-    <div className="min-h-screen flex flex-col">
+    // `relative` makes the absolutely-anchored space background scope cleanly.
+    <div className="min-h-screen flex flex-col relative overflow-x-clip">
+      {/* Global space-themed background (stars, moon, sun, solar system).
+          Rendered behind everything and follows the current theme. */}
+      <SpaceBackground theme={theme} />
+
       {/* Sticky navigation bar shown at the top of every page */}
       <Navbar theme={theme} toggleTheme={toggleTheme} />
 
-      {/* Main content area — flex-1 makes it expand to push the footer down */}
-      <main className="flex-1">
+      {/* Main content area — flex-1 makes it expand to push the footer down.
+          relative + z-10 keeps content above the fixed background. */}
+      <main className="flex-1 relative z-10">
         <Routes>
           {/* Home route: renders all sections from the `sections` array
               stacked vertically, with a horizontal divider between them. */}

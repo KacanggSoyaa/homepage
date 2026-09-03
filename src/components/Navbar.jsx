@@ -18,25 +18,27 @@ export default function Navbar({ theme, toggleTheme }) {
   return (
     // Sticky header bar that stays at the top of the viewport.
     // Uses backdrop-blur for a frosted-glass effect over content below.
-    <header className="border-b border-ink-200/10 dark:border-paper-50/5 bg-paper-50/90 dark:bg-ink-900/90 backdrop-blur sticky top-0 z-50">
+    // In dark mode its translucent black (space) tint blends with the sky.
+    <header className="border-b border-ink-200/10 dark:border-paper-50/5 bg-paper-50/80 dark:bg-space-900/70 backdrop-blur-md sticky top-0 z-50">
       {/* Main nav bar: brand logo on the left, links in the center, theme toggle on the right */}
       <nav className="container-page flex items-center justify-between h-16">
         {/* Brand logo — links back to home */}
-        <NavLink to="/" className="font-mono text-sm font-semibold tracking-tight">
-          <span className="text-amber">&lt;</span>
+        <NavLink to="/" className="group font-mono text-sm font-semibold tracking-tight">
+          <span className="text-amber dark:text-glow-amber transition-all">&lt;</span>
           danis
-          <span className="text-amber">/&gt;</span>
+          <span className="text-amber dark:text-glow-amber transition-all">/&gt;</span>
         </NavLink>
 
         {/* Desktop navigation: horizontal list of section links + About page link.
             Hidden on mobile (shown below sm breakpoint). */}
         <ul className="hidden sm:flex items-center gap-1 font-mono text-sm">
-          {/* Section links — anchor hrefs that scroll to sections on the main page */}
+          {/* Section links — anchor hrefs that scroll to sections on the main page.
+              Each gets a subtle pill highlight on hover for a cleaner UI. */}
           {sectionLinks.map((link) => (
             <li key={link.href}>
               <a
                 href={link.href}
-                className="prompt px-3 py-2 rounded-md transition-colors text-ink-600 dark:text-paper-200/70 hover:text-ink-900 dark:hover:text-paper-50"
+                className="prompt px-3.5 py-2 rounded-md transition-all text-ink-600 dark:text-paper-200/70 hover:text-ink-900 dark:hover:text-paper-50 hover:bg-ink-900/5 dark:hover:bg-paper-50/5"
               >
                 {link.label}
               </a>
@@ -47,10 +49,10 @@ export default function Navbar({ theme, toggleTheme }) {
             <NavLink
               to="/about"
               className={({ isActive }) =>
-                `prompt px-3 py-2 rounded-md transition-colors ${
+                `prompt px-3.5 py-2 rounded-md transition-all ${
                   isActive
-                    ? 'text-amber'
-                    : 'text-ink-600 dark:text-paper-200/70 hover:text-ink-900 dark:hover:text-paper-50'
+                    ? 'text-amber dark:text-glow-amber bg-ink-900/5 dark:bg-paper-50/5'
+                    : 'text-ink-600 dark:text-paper-200/70 hover:text-ink-900 dark:hover:text-paper-50 hover:bg-ink-900/5 dark:hover:bg-paper-50/5'
                 }`
               }
             >
@@ -64,7 +66,7 @@ export default function Navbar({ theme, toggleTheme }) {
           <button
             onClick={toggleTheme}
             aria-label="Toggle color theme"
-            className="w-9 h-9 flex items-center justify-center rounded-md border border-ink-200/20 dark:border-paper-50/10 text-ink-700 dark:text-paper-200 hover:border-amber/60 hover:text-amber transition-colors"
+            className="w-9 h-9 flex items-center justify-center rounded-md border border-ink-200/20 dark:border-paper-50/10 text-ink-700 dark:text-paper-200 hover:border-amber/60 hover:text-amber hover:shadow-lg hover:shadow-amber/10 transition-all"
           >
             {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
           </button>
@@ -92,7 +94,7 @@ export default function Navbar({ theme, toggleTheme }) {
             className={({ isActive }) =>
               `prompt px-2.5 py-1.5 rounded-md whitespace-nowrap transition-colors ${
                 isActive
-                  ? 'text-amber'
+                  ? 'text-amber dark:text-glow-amber'
                   : 'text-ink-600 dark:text-paper-200/70 hover:text-ink-900 dark:hover:text-paper-50'
               }`
             }
