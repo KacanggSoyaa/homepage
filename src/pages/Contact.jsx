@@ -50,7 +50,7 @@ export default function Contact() {
           <a href="https://github.com/KacanggSoyaa" className="flex items-center gap-2 font-mono text-sm text-ink-700 dark:text-paper-200/80 hover:text-amber transition-colors">
             <GithubIcon width="18" height="18" /> github
           </a>
-          <a href="#" className="flex items-center gap-2 font-mono text-sm text-ink-700 dark:text-paper-200/80 hover:text-amber transition-colors">
+          <a href="https://www.linkedin.com/in/danisnazri" className="flex items-center gap-2 font-mono text-sm text-ink-700 dark:text-paper-200/80 hover:text-amber transition-colors">
             <LinkedinIcon width="18" height="18" /> linkedin
           </a>
           <a href="https://www.instagram.com/dnazzry_" className="flex items-center gap-2 font-mono text-sm text-ink-700 dark:text-paper-200/80 hover:text-amber transition-colors">

@@ -22,7 +22,7 @@ export default function Footer() {
           <a href="https://github.com/KacanggSoyaa" aria-label="GitHub" className="hover:text-amber transition-colors">
             <GithubIcon />
           </a>
-          <a href="#" aria-label="LinkedIn" className="hover:text-amber transition-colors">
+          <a href="https://www.linkedin.com/in/danisnazri" aria-label="LinkedIn" className="hover:text-amber transition-colors">
             <LinkedinIcon />
           </a>
           <a href="mailto:kacanggsoyaa18@gmail.com" aria-label="Email" className="hover:text-amber transition-colors">
