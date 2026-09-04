@@ -6,14 +6,14 @@
 export const skillGroups = [
   {
     label: 'Languages',
-    items: ['Python', 'Java', 'C++', 'PHP', 'JavaScript'],
+    items: ['Python', 'Java', 'C++', 'PHP', 'JavaScript', 'HTML', 'CSS', 'SQL'],
   },
   {
     label: 'Frameworks & Tools',
-    items: ['React.js', 'Node.js', 'Git'],
+    items: ['React.js', 'Node.js', 'Git','Tailwind CSS', 'Bootstrap', 'Android Studio'],
   },
   {
     label: 'Databases',
-    items: ['MySQL'],
+    items: ['MySQL', 'MongoDB'],
   },
 ]

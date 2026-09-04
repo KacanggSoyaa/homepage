@@ -6,29 +6,29 @@
 export const projects = [
   {
     id: 1,
-    title: 'Project One',
+    title: 'Number Guessing Game',
     description:
-      'A short description of what this project does and the problem it solves. Replace with your real project summary.',
-    stack: ['React', 'Node.js', 'MySQL'],
-    github: '#',
-    demo: '#',
+      'My first project that I made Using Javascript. This project is a simple number guessing game where the user has to guess a number between 1 and 100.',
+    stack: ['JavaScript', 'HTML', 'CSS'],
+    github: 'https://github.com/KacanggSoyaa/Numberguessinggame.git',
+    demo: 'https://github.com/KacanggSoyaa/Numberguessinggame/releases/tag/1.0',
   },
   {
     id: 2,
-    title: 'Project Two',
+    title: 'Koperasi CBL Malaysia',
     description:
-      'A short description of what this project does and the problem it solves. Replace with your real project summary.',
-    stack: ['Java', 'MySQL'],
-    github: '#',
-    demo: '#',
+      'A project that I worked on during my internship at Consurv Technic Sdn Bhd. This Website is for Advertising and promoting the Koperasi CBL Malaysia.',
+    stack: ['React.js', 'Vite', 'Tailwind CSS'],
+    github: 'https://github.com/KacanggSoyaa/NEW-LOOKS-CBL.git',
+    demo: 'https://github.com/KacanggSoyaa/NEW-LOOKS-CBL/releases/tag/1.0',
   },
   {
     id: 3,
-    title: 'Project Three',
+    title: 'Portfolio Website',
     description:
-      'A short description of what this project does and the problem it solves. Replace with your real project summary.',
-    stack: ['PHP', 'JavaScript'],
-    github: '#',
-    demo: '#',
+      'A personal portfolio website to showcase my skills, projects, and experience as a software developer.',
+    stack: ['React.js', 'Vite', 'Tailwind CSS'],
+    github: 'https://github.com/KacanggSoyaa/homepage.git',
+    demo: 'https://github.com/KacanggSoyaa/homepage/releases/tag/1.0',
   },
 ]

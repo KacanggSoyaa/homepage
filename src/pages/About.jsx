@@ -57,7 +57,7 @@ export default function About() {
           <ScrollReveal key={group.label} delay={gi * 100}>
             <div>
               {/* Group label (e.g. "LANGUAGES", "FRAMEWORKS & TOOLS") */}
-              <p className="font-mono text-xs uppercase tracking-wide text-ink-600 dark:text-paper-200/50 mb-2">
+              <p className="font-mono text-xs uppercase tracking-wide text-ink-600 dark:text-paper-200/50 mb-2 hover:text-amber transition-colors">
                 {group.label}
               </p>
               {/* Skill pills rendered as bordered badges */}
@@ -65,7 +65,7 @@ export default function About() {
                 {group.items.map((item) => (
                   <span
                     key={item}
-                    className="font-mono text-xs px-3 py-1.5 rounded-md border border-ink-200/20 dark:border-paper-50/10 text-ink-700 dark:text-paper-200/80"
+                    className="font-mono text-xs px-3 py-1.5 rounded-md border border-ink-200/20 dark:border-paper-50/10 text-ink-700 dark:text-paper-200/80 hover:text-amber transition-colors"
                   >
                     {item}
                   </span>
@@ -100,6 +100,17 @@ export default function About() {
             I'm quite actively involved in my college's IT club, and learn to be brave
             to speak in front of people. I also learn to be a good team player and
             how to manage my time wisely.
+          </p>
+        </div>
+        <br />
+        <div className="border-l-2 border-ink-200/20 dark:border-paper-50/15 pl-5">
+          <p className="font-mono text-sm font-medium hover:text-amber transition-colors">Internship at Consurv Technic Sdn Bhd</p>
+          <p className="text-sm text-ink-700 dark:text-paper-200/70 mt-1">
+            Role as a IT Engineer Intern, from 3 August 2026 to 15th December 2026
+          </p>
+          <p className="text-sm text-ink-700 dark:text-paper-200/70 mt-2">
+            During my internship, I was able to learn a lot about the IT industry and gain valuable experience.
+            I was also able to improve my skills in programming, networking, and troubleshooting. 
           </p>
         </div>
       </ScrollReveal>
