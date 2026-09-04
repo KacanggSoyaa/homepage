@@ -60,3 +60,10 @@ export const AwardIcon = (props) => (
     <path d="M8.5 13 6.5 21l5.5-2.5L17.5 21l-2-8" />
   </svg>
 )
+
+// Trophy icon — used on achievement cards, stroke-based, default 28x28
+export const TrophyIcon = (props) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" width="28" height="28" {...props}>
+    <path d="M8 21h8M12 17v4M6 3h12v4a6 6 0 0 1-12 0V3ZM6 5H3v1a3 3 0 0 0 3 3M18 5h3v1a3 3 0 0 1-3 3" />
+  </svg>
+)

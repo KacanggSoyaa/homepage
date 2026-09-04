@@ -13,6 +13,7 @@ const sectionLinks = [
   { href: '/#home', label: 'home' },
   { href: '/#projects', label: 'projects' },
   { href: '/#certificates', label: 'certificates' },
+  { href: '/#achievements', label: 'achievements' },
   { href: '/#contact', label: 'contact' },
 ]
 

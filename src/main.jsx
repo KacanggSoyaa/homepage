@@ -16,6 +16,7 @@ import './index.css' // Global styles + Tailwind (v4 CSS-first config)
 import Home from './pages/Home.jsx'
 import Projects from './pages/Projects.jsx'
 import Certificates from './pages/Certificates.jsx'
+import Achievements from './pages/Achievements.jsx'
 import Contact from './pages/Contact.jsx'
 
 // Registry of sections rendered on the home page.
@@ -24,6 +25,7 @@ const sections = [
   { id: 'home', Component: Home },
   { id: 'projects', Component: Projects },
   { id: 'certificates', Component: Certificates },
+  { id: 'achievements', Component: Achievements },
   { id: 'contact', Component: Contact },
 ]
 

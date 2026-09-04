@@ -15,8 +15,7 @@ export default function Certificates() {
         <p className="prompt font-mono text-sm text-amber mb-2 dark:text-amber">certificates</p>
         <h1 className="text-3xl font-mono font-semibold mb-3 dark:text-glow-amber">Certifications</h1>
         <p className="text-ink-700 dark:text-paper-200/80 max-w-xl mb-10">
-          Courses and certifications I've completed — replace these
-          placeholders in <code className="font-mono text-xs bg-ink-900/5 dark:bg-paper-50/10 px-1.5 py-0.5 rounded">src/data/certificates.js</code>.
+          Courses and certifications I've completed <code className="font-mono text-xs bg-ink-900/5 dark:bg-paper-50/10 px-1.5 py-0.5 rounded">src/data/certificates.js</code>.
         </p>
       </ScrollReveal>
 
