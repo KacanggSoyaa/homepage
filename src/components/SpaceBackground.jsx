@@ -338,6 +338,62 @@ export default function SpaceBackground({ theme = 'dark' }) {
       ctx.fill()
     }
 
+    // Draw a Saturn-like ringed planet in the bottom-right area. Appears when
+    // the user scrolls toward the bottom, filling the space the moon leaves behind.
+    const drawRingedPlanet = (parallaxOffset = 0) => {
+      const rad = Math.min(width, height) * 0.055
+      const cx = width * 0.88 + parallaxOffset * 0.04
+      const cy = height * 0.82 + parallaxOffset
+
+      // Soft ambient glow
+      drawGlow(cx, cy, rad * 3.5, '220,180,140', isSpace ? 0.15 : 0.05)
+
+      // Planet body — warm amber/tan
+      const g = ctx.createRadialGradient(
+        cx - rad * 0.3, cy - rad * 0.3, rad * 0.05,
+        cx, cy, rad,
+      )
+      g.addColorStop(0, `rgba(240,210,170,${isSpace ? 0.9 : 0.45})`)
+      g.addColorStop(0.6, `rgba(200,160,110,${isSpace ? 0.85 : 0.4})`)
+      g.addColorStop(1, `rgba(160,120,80,${isSpace ? 0.8 : 0.35})`)
+      ctx.fillStyle = g
+      ctx.beginPath()
+      ctx.arc(cx, cy, rad, 0, Math.PI * 2)
+      ctx.fill()
+
+      // Horizontal band stripes (gas giant look)
+      ctx.save()
+      ctx.beginPath()
+      ctx.arc(cx, cy, rad, 0, Math.PI * 2)
+      ctx.clip()
+      const bands = [
+        { y: -0.35, h: 0.12, color: '180,140,90' },
+        { y: -0.1, h: 0.15, color: '200,165,120' },
+        { y: 0.15, h: 0.1, color: '170,130,85' },
+        { y: 0.3, h: 0.13, color: '190,150,100' },
+      ]
+      bands.forEach((b) => {
+        ctx.fillStyle = `rgba(${b.color},${isSpace ? 0.3 : 0.15})`
+        ctx.fillRect(cx - rad, cy + b.y * rad, rad * 2, b.h * rad)
+      })
+      ctx.restore()
+
+      // Rings — two tilted ellipses around the planet
+      const ringTilt = -0.25
+      const ringColors = [
+        `rgba(200,180,150,${isSpace ? 0.5 : 0.2})`,
+        `rgba(180,160,130,${isSpace ? 0.35 : 0.15})`,
+      ]
+      const ringRadii = [rad * 1.6, rad * 2.0]
+      ringRadii.forEach((r, i) => {
+        ctx.strokeStyle = ringColors[i]
+        ctx.lineWidth = 2.5 - i * 0.8
+        ctx.beginPath()
+        ctx.ellipse(cx, cy, r, r * 0.3, ringTilt, 0, Math.PI * 2)
+        ctx.stroke()
+      })
+    }
+
     // Draw one complete scene. When `animate` is true the stars twinkle and
     // meteors move (used by the animation loop); when false a single static
     // frame is drawn (used for prefers-reduced-motion).
@@ -394,6 +450,12 @@ export default function SpaceBackground({ theme = 'dark' }) {
       if (isSpace) {
         const moonDrift = reducedMotion ? 0 : scrollY * 0.12
         drawMoon(-moonDrift)
+      }
+
+      // ---- Ringed planet — bottom-right gas giant (Saturn-like) ----
+      if (isSpace) {
+        const ringDrift = reducedMotion ? 0 : scrollY * 0.08
+        drawRingedPlanet(-ringDrift)
       }
 
       // ---- Flying birds (light mode only — the animated, "windy" sky) ----

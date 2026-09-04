@@ -21,7 +21,7 @@ export default function About() {
         {/* Photo card — fixed at a 4:3 aspect ratio.
             To swap the image, replace src={photo} with a different import or URL. */}
         <ScrollReveal className="md:w-80 md:shrink-0 mb-8 md:mb-0">
-          <div className="glass rounded-lg border border-ink-200/15 dark:border-paper-50/10 overflow-hidden aspect-[3/4]">
+          <div className="glass rounded-lg border border-ink-200/15 dark:border-paper-50/10 overflow-hidden aspect-3/4">
             <img src={photo} alt="Danis Nazri" className="w-full h-full object-cover" />
           </div>
         </ScrollReveal>
