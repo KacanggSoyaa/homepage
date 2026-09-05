@@ -15,7 +15,7 @@ export default function Projects() {
         <p className="prompt font-mono text-sm text-amber mb-2 dark:text-amber">projects</p>
         <h1 className="text-3xl font-mono font-semibold mb-3 dark:text-glow-amber">Things I've built</h1>
         <p className="text-ink-700 dark:text-paper-200/80 max-w-xl mb-10">
-          A selection of projects — replace these placeholders with your real
+          A selection of projectss — replace these placeholders with your real
           work in <code className="font-mono text-xs bg-ink-900/5 dark:bg-paper-50/10 px-1.5 py-0.5 rounded">src/data/projects.js</code>.
         </p>
       </ScrollReveal>
