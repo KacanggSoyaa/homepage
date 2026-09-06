@@ -159,32 +159,6 @@
   }
 }
 
-/* Horizontal scrolling marquee used for the skills ticker in the hero panel.
-   Moves content left continuously over 22 seconds, pauses on hover.
-   The nested @media keeps the animation off for users who prefer reduced motion. */
-@utility marquee-track {
-  animation: marquee 22s linear infinite;
-
-  &:hover {
-    animation-play-state: paused;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
-  }
-}
-
-@keyframes marquee {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
-}
-
-/* Shorter marquee animation used inline in the hero JSON panel.
-   Scrolls the "Languages" field value across 10 seconds. */
 @utility animate-marquee-inline {
   animation: marquee-inline 10s linear infinite;
 }

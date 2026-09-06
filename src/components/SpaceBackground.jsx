@@ -187,12 +187,8 @@ export default function SpaceBackground({ theme = 'dark' }) {
       })
     }
 
-    // The smoothed value gives a gentle, non-jerky parallax drift.
-    const updateScroll = () => {
-      parallaxTarget = window.scrollY || window.pageYOffset || 0
-    }
-
-    // Scroll handler (throttled by the animation loop via smoothing)
+    // Scroll handler (throttled by the animation loop via smoothing).
+    // Just records the scroll offset; the easing happens inside the loop.
     const onScroll = () => {
       parallaxTarget = window.scrollY || window.pageYOffset || 0
     }
@@ -514,7 +510,7 @@ export default function SpaceBackground({ theme = 'dark' }) {
     reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
     resize()
-    updateScroll()
+    onScroll()
 
     if (reducedMotion) {
       // Reduced motion: draw a single static frame without the animation loop
