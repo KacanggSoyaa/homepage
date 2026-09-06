@@ -31,4 +31,13 @@ export const projects = [
     github: 'https://github.com/KacanggSoyaa/homepage.git',
     demo: 'https://github.com/KacanggSoyaa/homepage/releases/tag/1.0',
   },
+  {
+    id: 4,
+    title: 'Tetris Game',
+    description:
+      'A simple tetris game that I made using python and pygame. This project is a simple tetris game where the user has to play the game and try to get the highest score.',
+    stack: ['Python', 'Pygame'],
+    github: 'https://github.com/KacanggSoyaa/TetrisPython.git',
+    demo: 'https://github.com/KacanggSoyaa/TetrisPython/releases/tag/1.0',
+  },
 ]

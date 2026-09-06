@@ -24,8 +24,8 @@ import Contact from './pages/Contact.jsx'
 const sections = [
   { id: 'home', Component: Home },
   { id: 'projects', Component: Projects },
-  { id: 'certificates', Component: Certificates },
-  { id: 'achievements', Component: Achievements },
+  // Will update Later { id: 'certificates', Component: Certificates },
+  // Will update Later { id: 'achievements', Component: Achievements },
   { id: 'contact', Component: Contact },
 ]
 

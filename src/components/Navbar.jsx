@@ -12,8 +12,8 @@ import { SunIcon, MoonIcon } from './Icons.jsx'
 const sectionLinks = [
   { href: '/#home', label: 'home' },
   { href: '/#projects', label: 'projects' },
-  { href: '/#certificates', label: 'certificates' },
-  { href: '/#achievements', label: 'achievements' },
+  // Will update later { href: '/#certificates', label: 'certificates' },
+  // Will update later { href: '/#achievements', label: 'achievements' },
   { href: '/#contact', label: 'contact' },
 ]
 
