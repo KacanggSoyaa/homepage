@@ -34,7 +34,7 @@ export const blogPosts = [
     date: '2026-08-23',
     text: "Going out touching some grass ",
     content:
-      "Spend my time alone by myself cause I don't have someone special to ask me out. I went to new Ombak KLCC Mall that just launched near KLCC park",
+      "Spend my time alone by myself cause I don't have someone special to ask me out. I went to new Ombak KLCC Mall that just launched near KLCC park, there's not much of stuff yet",
     tag: 'weekend',
     rating: 4,
     // Direct image link (extracted from the Google Photos share page).
