@@ -14,6 +14,6 @@ import react from '@vitejs/plugin-react' // Enables React Fast Refresh + JSX sup
 import tailwindcss from '@tailwindcss/vite' // Enables Tailwind CSS v4 (CSS-first config)
 
 export default defineConfig({
-  base: '/homepage/',
+  base: '/',
   plugins: [react(), tailwindcss()],
 })
