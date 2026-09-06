@@ -4,8 +4,9 @@
 
 import { Link, useParams } from 'react-router-dom'
 import { blogPosts } from '../data/blog.js'
-import { HeartIcon, ExternalLinkIcon } from '../components/Icons.jsx'
+import { ExternalLinkIcon } from '../components/Icons.jsx'
 import ImageCarousel from '../components/ImageCarousel.jsx'
+import RatingStars from '../components/RatingStars.jsx'
 import ScrollReveal from '../components/ScrollReveal.jsx'
 
 // Format a date string (YYYY-MM-DD) into a short, human-readable label.
@@ -82,21 +83,21 @@ export default function Thread() {
             {post.content || post.text}
           </div>
 
-          {/* Attached photos — shown large as a swipeable carousel */}
+          {/* Attached photos — shown as a square, Instagram-style carousel */}
           {post.images?.length > 0 && (
             <div className="mt-6">
               <ImageCarousel
                 images={post.images}
                 alt={`Photo for thread ${post.id}`}
-                className="aspect-[4/5] sm:aspect-auto sm:h-[30rem]"
+                className="aspect-3/4 mx-auto w-full max-w-[28rem]"
               />
             </div>
           )}
 
-          {/* Footer: like count */}
-          <div className="mt-6 pt-4 border-t border-ink-200/10 dark:border-paper-50/10 flex items-center gap-1.5 text-ink-600 dark:text-paper-200/60">
-            <HeartIcon />
-            <span className="font-mono text-xs">{post.likes} likes</span>
+          {/* Footer: my rating of the thread */}
+          <div className="mt-6 pt-4 border-t border-ink-200/10 dark:border-paper-50/10 flex items-center gap-2 text-ink-600 dark:text-paper-200/60">
+            <RatingStars rating={post.rating} size={16} />
+            <span className="font-mono text-xs">my rating</span>
           </div>
         </div>
 

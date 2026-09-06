@@ -4,8 +4,8 @@
 // button links to the post's full detail page (/blog/:id).
 
 import { Link } from 'react-router-dom'
-import { HeartIcon } from './Icons.jsx'
 import ImageCarousel from './ImageCarousel.jsx'
+import RatingStars from './RatingStars.jsx'
 
 // Format a date string (YYYY-MM-DD) into a short, human-readable label like
 // "Sep 6, 2026" — keeps the source data simple while displaying cleanly.
@@ -21,9 +21,6 @@ export default function BlogCard({ post }) {
     <article className="py-3 px-2 sm:px-3">
       {/* Header row: avatar + handle + timestamp, like a social post */}
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full flex items-center justify-center bg-gradient-to-br from-amber to-teal text-ink-950 font-mono font-bold text-sm shrink-0">
-          D
-        </div>
         <div className="min-w-0">
           <p className="font-mono text-sm font-semibold leading-tight">danis</p>
           <p className="font-mono text-xs text-ink-600 dark:text-paper-200/60 leading-tight">
@@ -53,12 +50,9 @@ export default function BlogCard({ post }) {
         </div>
       )}
 
-      {/* Footer: like count + "open thread" button */}
+      {/* Footer: star rating + "open thread" button */}
       <div className="mt-4 pt-3 border-t border-ink-200/10 dark:border-paper-50/10 flex items-center justify-between text-ink-600 dark:text-paper-200/60">
-        <span className="flex items-center gap-1.5">
-          <HeartIcon />
-          <span className="font-mono text-xs">{post.likes}</span>
-        </span>
+        <RatingStars rating={post.rating} />
         <Link
           to={`/blog/${post.id}`}
           className="font-mono text-xs px-3 py-1.5 rounded-md border border-ink-200/20 dark:border-paper-50/10 text-ink-700 dark:text-paper-200/80 hover:text-amber dark:hover:text-glow-amber hover:border-amber/60 transition-all"

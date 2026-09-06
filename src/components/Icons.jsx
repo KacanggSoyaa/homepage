@@ -68,9 +68,17 @@ export const TrophyIcon = (props) => (
   </svg>
 )
 
-// Heart icon — used on blog cards for the like count, default 15x15
-export const HeartIcon = (props) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="15" height="15" {...props}>
-    <path d="M12 21s-8-5.5-8-11a4.6 4.6 0 0 1 8-3.2A4.6 4.6 0 0 1 20 10c0 5.5-8 11-8 11Z" />
+// Star icon — used for thread ratings; `filled` renders a solid star, default 14x14
+export const StarIcon = ({ filled = false, ...props }) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill={filled ? 'currentColor' : 'none'}
+    stroke="currentColor"
+    strokeWidth="1.8"
+    width="14"
+    height="14"
+    {...props}
+  >
+    <path d="m12 2.5 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3-5.8 3 1.1-6.5-4.7-4.6 6.5-.9 2.9-5.9Z" />
   </svg>
 )

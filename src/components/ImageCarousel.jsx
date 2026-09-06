@@ -1,40 +1,40 @@
 // ImageCarousel.jsx — swipeable carousel for thread attachments.
-// Renders one image at a time with prev/next arrows, clickable dots, and a
-// "1 / 3" counter, in the style of Instagram/Threads. Supports touch swiping.
+// Slides horizontally through the images with a smooth CSS transition, with
+// prev/next arrows, clickable dots, and a "1 / 3" counter, in the style of
+// Instagram/Threads. Supports touch swiping and a per-slide retry-on-error.
 //
 // Props:
 //   - images    : array of image sources (URLs or imported files)
 //   - alt       : base alt text (a number suffix is appended per image)
-//   - className : controls the visual height (e.g. "h-44" in the feed,
-//                 a taller value on the detail page)
+//   - className : controls the visual shape (e.g. "aspect-3/4" on the detail
+//                 page, a fixed height like "h-44" in the feed)
 
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 
-export default function ImageCarousel({ images = [], alt = 'attachment', className = 'h-64' }) {
+export default function ImageCarousel({ images = [], alt = 'attachment', className = 'aspect-4/3' }) {
   const [index, setIndex] = useState(0)
-  const [failed, setFailed] = useState(false)
-  const [retry, setRetry] = useState(0)
+  const [attempts, setAttempts] = useState({})
+  const [failed, setFailed] = useState({})
+  const pending = useRef({})
   const touchX = useRef(null)
   const count = images.length
 
-  // If there are no images (or just one), fall back to whatever is useful.
+  // If there are no images, render nothing.
   if (count === 0) return null
-
-  // Reset the failure flag and retry counter whenever we switch photos (e.g. a
-  // link that was erroring on one slide may load fine again on the next).
-  useEffect(() => {
-    setFailed(false)
-    setRetry(0)
-  }, [index])
 
   // Some CDNs (Google Photos' lh3 host) occasionally refuse a request at first
   // (429/403, referer checks, rate limits) but serve it fine a moment later.
-  // Give it ONE automatic retry before showing the "unavailable" placeholder.
-  const handleError = () => {
-    if (retry < 1) {
-      setTimeout(() => setRetry((r) => r + 1), 1200)
-    } else {
-      setFailed(true)
+  // Give each slide ONE automatic retry before showing the "unavailable"
+  // placeholder — bumping `attempts` remounts the img and re-requests it.
+  const handleError = (i) => {
+    if (attempts[i]) {
+      setFailed((f) => (f[i] ? f : { ...f, [i]: true }))
+    } else if (!pending.current[i]) {
+      pending.current[i] = true
+      setTimeout(() => {
+        pending.current[i] = false
+        setAttempts((a) => ({ ...a, [i]: (a[i] || 0) + 1 }))
+      }, 1200)
     }
   }
 
@@ -58,26 +58,37 @@ export default function ImageCarousel({ images = [], alt = 'attachment', classNa
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
     >
-      {/* Current image — animates in slightly when switching.
-          If a hosted link fails to load, show a neat placeholder instead. */}
-      {!failed ? (
-        <img
-          key={`${index}-${retry}`}
-          src={images[index]}
-          alt={`${alt} ${index + 1}`}
-          className="w-full h-full object-cover"
-          loading="lazy"
-          draggable={false}
-          referrerPolicy="no-referrer"
-          onError={handleError}
-        />
-      ) : (
-        <div className="w-full h-full flex items-center justify-center bg-ink-900/5 dark:bg-space-800 text-ink-600 dark:text-paper-200/50 font-mono text-xs p-4 text-center">
-          image unavailable
-          <br />
-          check the link
-        </div>
-      )}
+      {/* Sliding track — every slide sits side-by-side and the track translates,
+          which gives the smooth Instagram-style slide when you navigate. */}
+      <div
+        className="flex h-full transition-transform duration-500 ease-out"
+        style={{ width: `${count * 100}%`, transform: `translateX(-${(index * 100) / count}%)` }}
+      >
+        {images.map((src, i) => {
+          const slideWidth = 100 / count
+          return (
+            <div key={`${i}-${attempts[i] || 0}`} className="h-full shrink-0" style={{ width: `${slideWidth}%` }}>
+              {!failed[i] ? (
+                <img
+                  src={src}
+                  alt={`${alt} ${i + 1}`}
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                  draggable={false}
+                  referrerPolicy="no-referrer"
+                  onError={() => handleError(i)}
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-ink-900/5 dark:bg-space-800 text-ink-600 dark:text-paper-200/50 font-mono text-xs p-4 text-center">
+                  image unavailable
+                  <br />
+                  check the link
+                </div>
+              )}
+            </div>
+          )
+        })}
+      </div>
 
       {/* Counter badge in the top-right corner */}
       {count > 1 && (
@@ -122,9 +133,7 @@ export default function ImageCarousel({ images = [], alt = 'attachment', classNa
               aria-label={`Go to photo ${i + 1}`}
               onClick={() => setIndex(i)}
               className={`w-1.5 h-1.5 rounded-full transition-colors ${
-                i === index
-                  ? 'bg-amber'
-                  : 'bg-paper-50/50 hover:bg-paper-50/80'
+                i === index ? 'bg-amber' : 'bg-paper-50/50 hover:bg-paper-50/80'
               }`}
             />
           ))}
