@@ -10,7 +10,7 @@ export const skillGroups = [
   },
   {
     label: 'Frameworks & Tools',
-    items: ['React.js', 'Node.js', 'Git','Tailwind CSS', 'Bootstrap', 'Android Studio'],
+    items: ['React.js', 'Node.js', 'Git', 'Tailwind CSS', 'Bootstrap', 'Android Studio'],
   },
   {
     label: 'Databases',
