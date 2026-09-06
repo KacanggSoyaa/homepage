@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "heic:jpg": "node scripts/heic-to-jpg.mjs",
+    "gphoto:link": "node scripts/gphoto-link.mjs"
   },
   "dependencies": {
     "react": "^19.2.8",
@@ -16,6 +18,8 @@
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",
     "@vitejs/plugin-react": "^5.2.0",
+    "heic-convert": "^2.1.0",
+    "sharp": "^0.35.4",
     "tailwindcss": "^4.3.3",
     "vite": "^6.4.3"
   }

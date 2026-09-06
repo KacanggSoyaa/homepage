@@ -1,10 +1,11 @@
 // BlogCard.jsx — displays a single blog post in a social-media thread style.
-// Showed in the scrollable feed on the About page. If the post has an attached
-// image it renders as a thumbnail, and an "open thread" button links to the
-// post's full detail page (/blog/:id).
+// Shown in the scrollable feed on the About page. If the post has attached
+// photos they render as a swipeable carousel thumbnail, and an "open thread"
+// button links to the post's full detail page (/blog/:id).
 
 import { Link } from 'react-router-dom'
 import { HeartIcon } from './Icons.jsx'
+import ImageCarousel from './ImageCarousel.jsx'
 
 // Format a date string (YYYY-MM-DD) into a short, human-readable label like
 // "Sep 6, 2026" — keeps the source data simple while displaying cleanly.
@@ -41,19 +42,15 @@ export default function BlogCard({ post }) {
         {post.text}
       </p>
 
-      {/* Attached picture (if any) — click opens the full thread page */}
-      {post.image && (
-        <Link
-          to={`/blog/${post.id}`}
-          className="mt-3 block rounded-md overflow-hidden border border-ink-200/15 dark:border-paper-50/10 hover:border-amber/50 transition-colors"
-        >
-          <img
-            src={post.image}
-            alt={`Attachment for thread ${post.id}`}
-            className="w-full h-44 object-cover hover:opacity-90 transition-opacity"
-            loading="lazy"
+      {/* Attached photo carousel (if any) — supports multiple images */}
+      {post.images?.length > 0 && (
+        <div className="mt-3">
+          <ImageCarousel
+            images={post.images}
+            alt={`Photo for thread ${post.id}`}
+            className="h-44 sm:h-56"
           />
-        </Link>
+        </div>
       )}
 
       {/* Footer: like count + "open thread" button */}

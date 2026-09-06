@@ -5,6 +5,7 @@
 import { Link, useParams } from 'react-router-dom'
 import { blogPosts } from '../data/blog.js'
 import { HeartIcon, ExternalLinkIcon } from '../components/Icons.jsx'
+import ImageCarousel from '../components/ImageCarousel.jsx'
 import ScrollReveal from '../components/ScrollReveal.jsx'
 
 // Format a date string (YYYY-MM-DD) into a short, human-readable label.
@@ -81,13 +82,15 @@ export default function Thread() {
             {post.content || post.text}
           </div>
 
-          {/* Attached picture, shown large */}
-          {post.image && (
-            <img
-              src={post.image}
-              alt={`Attachment for thread ${post.id}`}
-              className="mt-6 w-full rounded-md border border-ink-200/15 dark:border-paper-50/10"
-            />
+          {/* Attached photos — shown large as a swipeable carousel */}
+          {post.images?.length > 0 && (
+            <div className="mt-6">
+              <ImageCarousel
+                images={post.images}
+                alt={`Photo for thread ${post.id}`}
+                className="aspect-[4/5] sm:aspect-auto sm:h-[30rem]"
+              />
+            </div>
           )}
 
           {/* Footer: like count */}
