@@ -3,15 +3,17 @@
 // It owns the dark/light theme state and smooth-scroll behavior for anchors.
 
 import { useEffect, useState } from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import Navbar from './components/Navbar.jsx'
 import Footer from './components/Footer.jsx'
 import SpaceBackground from './components/SpaceBackground.jsx'
 import About from './pages/About.jsx'
+import Thread from './pages/Thread.jsx'
 
 // App is the root component. It receives the `sections` array from main.jsx
 // and renders them on the "/" route. About stays on its own "/about" route.
 export default function App({ sections }) {
+  const location = useLocation()
   // ------------------------------------------------------------
   // Theme state: reads from localStorage on first render, defaults to "dark".
   // The value is either "dark" or "light" and is synced to the <html> class
@@ -34,16 +36,18 @@ export default function App({ sections }) {
     localStorage.setItem('theme', theme)
   }, [theme])
 
-  // On initial page load, if the URL contains a hash (e.g. /#projects),
-  // smooth-scroll to that section once the DOM is ready so users landing
-  // on a deep-linked section start at the right place.
+  // On navigation: if the URL contains a hash (e.g. /about#threads), smooth-scroll
+  // to that element once the page has rendered, so deep links like the "back to
+  // threads" button land in the right spot. Without a hash, scroll back to top.
   useEffect(() => {
     const hash = window.location.hash
     if (hash) {
       const el = document.getElementById(hash.slice(1))
       if (el) el.scrollIntoView({ behavior: 'smooth' })
+    } else {
+      window.scrollTo({ top: 0 })
     }
-  }, [])
+  }, [location])
 
   // Flip between dark and light themes (used by the navbar toggle).
   const toggleTheme = () => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))
@@ -84,6 +88,8 @@ export default function App({ sections }) {
           />
           {/* About page lives on its own route, separate from the main scroll */}
           <Route path="/about" element={<About />} />
+          {/* Full detail page for a single blog thread (/blog/:id) */}
+          <Route path="/blog/:id" element={<Thread />} />
         </Routes>
       </main>
 

@@ -67,3 +67,10 @@ export const TrophyIcon = (props) => (
     <path d="M8 21h8M12 17v4M6 3h12v4a6 6 0 0 1-12 0V3ZM6 5H3v1a3 3 0 0 0 3 3M18 5h3v1a3 3 0 0 1-3 3" />
   </svg>
 )
+
+// Heart icon — used on blog cards for the like count, default 15x15
+export const HeartIcon = (props) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="15" height="15" {...props}>
+    <path d="M12 21s-8-5.5-8-11a4.6 4.6 0 0 1 8-3.2A4.6 4.6 0 0 1 20 10c0 5.5-8 11-8 11Z" />
+  </svg>
+)
