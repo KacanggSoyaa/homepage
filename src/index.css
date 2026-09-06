@@ -1,0 +1,264 @@
+/* ============================================================
+   MAIN STYLESHEET — Tailwind CSS v4 (CSS-first configuration).
+
+   Tailwind v4 replaces the old JavaScript config files
+   (tailwind.config.js / postcss.config.js) with CSS configuration
+   using the @theme directive. All design tokens below define the
+   palette, fonts, and spacing used across the site and are
+   automatically converted into Tailwind utility classes.
+
+   How utilities work here:
+     - Colors like `bg-ink-900`, `text-paper-50`, `text-amber` come
+       from the `--color-*` tokens below.
+     - Fonts `font-mono` / `font-sans` come from `--font-*` tokens.
+     - `max-w-content` comes from the `--max-width-content` token.
+   ============================================================ */
+
+/* Load Tailwind's base styles, components, and utility layers */
+@import "tailwindcss";
+
+/* ============================================================
+   Dark-mode variant (class-based).
+   Tailwind v4's default `dark:` variant follows the OS color-scheme
+   preference (prefers-color-scheme). This site instead toggles a `.dark`
+   class on the <html> element via the theme switch, so we override the
+   variant so `dark:` utilities apply only when .dark is present on an
+   ancestor. This preserves the original class-based dark/light toggle.
+   ============================================================ */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ============================================================
+   @theme — Design tokens (Tailwind v4 CSS-first configuration).
+
+   These replace the `theme.extend` block that used to live in
+   tailwind.config.js. Each variable generates matching utilities.
+   ============================================================ */
+@theme {
+  /* --font-* tokens power the `font-mono` and `font-sans` utilities.
+     IBM Plex Mono is used for code-style text, IBM Plex Sans for body. */
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+
+  /* --color-* tokens power text/bg/border color utilities.
+     "ink" = dark greys (used for the dark theme),
+     "paper" = light greys/whites (used for the light theme),
+     "space" = near-black deep-space background (used for the space theme),
+     "amber" and "teal" are the two accent colors. */
+  --color-ink-950: #0F1117;
+  --color-ink-900: #12141C;
+  --color-ink-800: #1A1D29;
+  --color-ink-700: #242836;
+  --color-ink-600: #333849;
+
+  --color-paper-50: #F3F5F7;
+  --color-paper-100: #FFFFFF;
+  --color-paper-200: #E4E7EC;
+
+  /* Deep-space black for the dark-mode background */
+  --color-space-950: #03040A;
+  --color-space-900: #05070F;
+  --color-space-800: #0A0E1A;
+
+  --color-amber: #E8A33D;
+  --color-amber-light: #F0B85F;
+  --color-amber-dark: #C4832A;
+
+  --color-teal: #5EC8C0;
+  --color-teal-light: #7FD6CF;
+
+  /* --max-width-* token powers the `max-w-content` utility
+     (a centered page container used across every section). */
+  --max-width-content: 72rem;
+}
+
+/* ============================================================
+   @layer base — Global styles applied to raw HTML elements.
+
+   These sit at low specificity so component/utility classes can
+   override them. @apply inlines the referenced utility styles.
+   ============================================================ */
+@layer base {
+  /* Enable smooth scrolling for in-page anchor links (e.g. #projects) */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Default body colors + font based on the current theme (dark/light).
+     In dark mode the background is deep space black (space-950) so the
+     glowing moon, sun, and stars in SpaceBackground stand out clearly.
+     In light mode it is a soft "daylight sky" gradient.
+     transition-colors makes theme switches animate smoothly. */
+  body {
+    @apply bg-paper-50 text-ink-900 dark:bg-space-950 dark:text-paper-50 font-sans transition-colors duration-300;
+  }
+
+  /* Light-mode background: a soft, muted daylight sky (gentle on the eyes).
+     The top is a calm blue-grey and it eases into a faint warm haze at the
+     bottom. Kept deliberately low-contrast so it does not glare like pure
+     white while still feeling bright and airy. */
+  body {
+    background-image:
+      linear-gradient(180deg, #DCE6F0 0%, #E7EAF0 45%, #ECE6EA 80%, #EEEFEC 100%);
+    background-attachment: fixed;
+  }
+
+  /* Dark-mode background depth: a very subtle blue/purple radial tint that
+     sits behind the canvas animation, giving the sky a slight gradient. */
+  .dark body {
+    background-image:
+      radial-gradient(60rem 40rem at 80% 10%, rgba(80, 90, 180, 0.12), transparent 60%),
+      radial-gradient(50rem 40rem at 15% 90%, rgba(120, 80, 200, 0.10), transparent 60%);
+  }
+
+  /* Highlight selected text with a semi-transparent amber tint */
+  ::selection {
+    @apply bg-amber/30;
+  }
+
+  /* Accessible focus ring: a 2px amber outline shown only on keyboard focus */
+  :focus-visible {
+    outline: 2px solid #E8A33D;
+    outline-offset: 2px;
+  }
+}
+
+/* ============================================================
+   Custom utilities — defined with @utility so they can be used
+   with variants (e.g. dark:prompt) just like built-in utilities.
+   ============================================================ */
+
+/* Centered page container with horizontal padding and a max-width.
+   Used on almost every section to keep content aligned. */
+@utility container-page {
+  @apply max-w-content mx-auto px-6 sm:px-8;
+}
+
+/* Adds a "~/ " prefix before text in amber color.
+   Used on nav links and section headings to mimic a terminal prompt. */
+@utility prompt {
+  &::before {
+    content: "~/";
+    @apply text-amber/70 dark:text-amber/60 mr-1;
+  }
+}
+
+/* Blinking cursor animation for the "$ whoami" prompt on the home hero.
+   Simulates a terminal cursor with a 1-second blink cycle. */
+@utility caret {
+  display: inline-block;
+  width: 0.55ch;
+  background: currentColor;
+  margin-left: 2px;
+  animation: blink 1s steps(1) infinite;
+}
+
+/* The blink keyframes used by the .caret utility above */
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Horizontal scrolling marquee used for the skills ticker in the hero panel.
+   Moves content left continuously over 22 seconds, pauses on hover.
+   The nested @media keeps the animation off for users who prefer reduced motion. */
+@utility marquee-track {
+  animation: marquee 22s linear infinite;
+
+  &:hover {
+    animation-play-state: paused;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Shorter marquee animation used inline in the hero JSON panel.
+   Scrolls the "Languages" field value across 10 seconds. */
+@utility animate-marquee-inline {
+  animation: marquee-inline 10s linear infinite;
+}
+
+@keyframes marquee-inline {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* ============================================================
+   Glow utilities — give text/elements a soft neon "space light" glow.
+   These are only meaningful in dark mode where the glow is visible.
+   ============================================================ */
+
+/* Amber text glow — used on headings/keywords (e.g. hero name, section titles) */
+@utility text-glow-amber {
+  text-shadow: 0 0 8px rgba(232, 163, 61, 0.55), 0 0 24px rgba(232, 163, 61, 0.35);
+}
+
+/* Teal text glow — used on secondary accents */
+@utility text-glow-teal {
+  text-shadow: 0 0 8px rgba(94, 200, 192, 0.55), 0 0 24px rgba(94, 200, 192, 0.35);
+}
+
+/* Soft white text glow — used on large headings (space-like) */
+@utility text-glow-white {
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.45);
+}
+
+/* ============================================================
+   Glass card utility — frosted translucent surface with a soft shadow.
+   Used on cards/panels so content stays readable over the animated
+   background in both light ("daylight") and dark ("space") modes.
+   ============================================================ */
+@utility glass {
+  background: rgba(255, 255, 255, 0.55);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 24px -12px rgba(23, 30, 60, 0.18);
+}
+
+/* Dark-mode glass: a deep translucent black that reads well over the space scene */
+.dark .glass {
+  background: rgba(5, 7, 15, 0.6);
+  box-shadow: 0 8px 24px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* ============================================================
+   Feed scrollbar utility — slim, theme-aware scrollbar used on
+   the scrollable blog feed in the About page so it looks tidy
+   instead of a chunky default browser scrollbar.
+   ============================================================ */
+@utility feed-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(232, 163, 61, 0.5) transparent;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(232, 163, 61, 0.5);
+    border-radius: 9999px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(232, 163, 61, 0.8);
+  }
+}
