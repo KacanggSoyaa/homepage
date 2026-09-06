@@ -35,7 +35,7 @@ const sections = [
 //   - The `sections` array is passed into <App> so it knows what to render on "/".
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <BrowserRouter basename="/homepage">
+    <BrowserRouter basename="/">
       <App sections={sections} />
     </BrowserRouter>
   </React.StrictMode>,
