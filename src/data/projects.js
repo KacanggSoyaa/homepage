@@ -40,4 +40,13 @@ export const projects = [
     github: 'https://github.com/KacanggSoyaa/TetrisPython.git',
     demo: 'https://github.com/KacanggSoyaa/TetrisPython/releases/tag/1.0',
   },
+  {
+    id: 5,
+    title: 'Money Tracker',
+    description:
+      'A Money tracker app that I made using Flutter and Dart. This project is a simple money tracker app where the user can track their income and expenses.',
+    stack: ['Flutter', 'Dart'],
+    github: 'https://github.com/KacanggSoyaa/moneytracker.git',
+    demo: '',
+  },
 ]
