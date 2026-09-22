@@ -49,4 +49,13 @@ export const projects = [
     github: 'https://github.com/KacanggSoyaa/moneytracker.git',
     demo: '',
   },
+  {
+    id: 6,
+    title: 'xSoya Music',
+    description:
+      'A Music streaming Website that I made using Svelte and Typescript. This project is a simple music streaming app where the user can listen to their favorite songs without ads.',
+    stack: ['Svelte', 'Typescript'],
+    github: 'https://github.com/KacanggSoyaa/xsoya-music.git',
+    demo: '',
+  },
 ]
