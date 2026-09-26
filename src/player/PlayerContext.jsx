@@ -6,6 +6,12 @@
 // the user scrolls or navigates between routes. Every control (the dock, the
 // /music page) reads the same context instead of owning its own audio.
 //
+// The site has any number of playlists, and exactly one of them is loaded at a
+// time. Callbacks never close over a playlist: they read engine.current, which
+// holds the active playlist's id, and resolve it through the data layer on every
+// call. That is what keeps a handler bound to the audio element — `ended` fires
+// long after a render — from advancing a playlist that is no longer loaded.
+//
 // Mutable state is mirrored into a ref as well as into React state. The
 // element's event handlers and the transport callbacks need the newest values
 // at all times — `ended` fires while React state may still be catching up —
@@ -20,12 +26,16 @@ import {
   useRef,
   useState,
 } from 'react'
-import { playlist, tracks } from '../data/playlist.js'
+import { getPlaylist, playlists } from '../data/playlist.js'
 
 const PlayerContext = createContext(null)
 
 const PREFS_KEY = 'player:prefs'
 const REPEAT_MODES = ['off', 'all', 'one']
+
+// Stand-in track list for a library with nothing in it. Module-level so the
+// identity is stable and an empty library does not re-render on every commit.
+const EMPTY = []
 
 // "m:ss" for a duration in seconds, floored so a track never reads 2:30 early.
 export function formatTime(seconds) {
@@ -34,10 +44,11 @@ export function formatTime(seconds) {
   return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`
 }
 
-// Volume, mute and the two playback modes are the settings a listener expects
-// to survive a reload, so they are the only things persisted.
+// Volume, mute, the two playback modes and the playlist you last had open are
+// the settings a listener expects to survive a reload, so they are the only
+// things persisted.
 function loadPrefs() {
-  const defaults = { volume: 0.7, muted: false, repeat: 'all', shuffle: false }
+  const defaults = { volume: 0.7, muted: false, repeat: 'all', shuffle: false, playlistId: null }
   try {
     const saved = JSON.parse(localStorage.getItem(PREFS_KEY) || 'null')
     if (!saved) return defaults
@@ -49,6 +60,9 @@ function loadPrefs() {
       muted: typeof saved.muted === 'boolean' ? saved.muted : defaults.muted,
       repeat: REPEAT_MODES.includes(saved.repeat) ? saved.repeat : defaults.repeat,
       shuffle: typeof saved.shuffle === 'boolean' ? saved.shuffle : defaults.shuffle,
+      // A remembered id that no longer exists is not an error: getPlaylist falls
+      // back to the first playlist, which is the right thing to open.
+      playlistId: typeof saved.playlistId === 'string' ? saved.playlistId : defaults.playlistId,
     }
   } catch {
     // No storage, or corrupt JSON. Defaults are a fine outcome.
@@ -91,9 +105,14 @@ export function PlayerProvider({ children }) {
   const initial = useRef(null)
   if (initial.current === null) {
     const prefs = loadPrefs()
+    // getPlaylist resolves the remembered id, falling back to the first
+    // playlist when it has been renamed or deleted since the last visit.
+    const opening = getPlaylist(prefs.playlistId)
+    const count = opening?.tracks.length ?? 0
     initial.current = {
+      playlistId: opening?.id ?? null,
       index: 0,
-      order: buildOrder(tracks.length, 0, prefs.shuffle),
+      order: buildOrder(count, 0, prefs.shuffle),
       shuffle: prefs.shuffle,
       repeat: prefs.repeat,
       volume: prefs.volume,
@@ -140,11 +159,17 @@ export function PlayerProvider({ children }) {
     else start()
   }, [start])
 
+  // The playlist currently loaded into the element. Resolved through the data
+  // layer on every read rather than closed over, so the audio element's event
+  // handlers — which are bound once and outlive any single playlist — always
+  // act on the playlist that is loaded now.
+  const activePlaylist = useCallback(() => getPlaylist(engine.current.playlistId), [])
+
   // Point the element at a track and optionally begin playing it.
   const load = useCallback(
     (index, autoplay) => {
       const element = audioRef.current
-      const track = tracks[index]
+      const track = activePlaylist()?.tracks[index]
       if (!element || !track) return
       commit({
         index,
@@ -159,7 +184,7 @@ export function PlayerProvider({ children }) {
       element.load()
       if (autoplay) start()
     },
-    [commit, start],
+    [activePlaylist, commit, start],
   )
 
   // Walk the playback order by `delta` positions. `forced` is set when the
@@ -208,17 +233,83 @@ export function PlayerProvider({ children }) {
     step(-1, true)
   }, [commit, step])
 
-  // Play the track at `index`. Tapping the row that is already loaded is
-  // treated as play/pause, which is what people expect from a tracklist.
+  // Load a different playlist.
+  //
+  // A switch is meant to be unobtrusive, so the track that happens to be in both
+  // playlists keeps playing untouched rather than restarting. Otherwise the
+  // element is pointed at the new playlist's opening track.
+  //
+  // `play` is for the case where the listener asked for sound — tapping a row,
+  // or switching playlists while something was already playing. It is a request,
+  // not a guarantee: start() swallows the rejection browsers raise for play()
+  // outside a user gesture, and the honest paused state is what shows instead.
+  const switchPlaylist = useCallback(
+    (id, { index: at, play = false } = {}) => {
+      const next = getPlaylist(id)
+      const element = audioRef.current
+      if (!next) return
+
+      const previous = activePlaylist()
+      const loadedSrc = previous?.tracks[engine.current.index]?.src
+      const shared = loadedSrc ? next.tracks.findIndex((track) => track.src === loadedSrc) : -1
+      const index = at ?? (shared >= 0 ? shared : 0)
+      const track = next.tracks[index]
+
+      commit({
+        playlistId: next.id,
+        index,
+        order: buildOrder(next.tracks.length, index, engine.current.shuffle),
+        currentTime: 0,
+        duration: 0,
+        buffered: 0,
+        ready: false,
+        loading: Boolean(track),
+        error: null,
+      })
+
+      if (!element) return
+
+      if (!track) {
+        // An empty playlist. Stop rather than leave the previous track running
+        // with no row to select and no dock to pause it with.
+        element.pause()
+        element.removeAttribute('src')
+        element.load()
+        return
+      }
+
+      // The element already holds this track, so playback carries on and only
+      // the surrounding state needed updating.
+      if (loadedSrc === track.src) {
+        if (play) start()
+        return
+      }
+
+      element.src = track.src
+      element.load()
+      if (play) start()
+    },
+    [activePlaylist, commit, start],
+  )
+
+  // Play a track from a named playlist. The playlist is named rather than
+  // implied so that tapping a row on a playlist the engine has not caught up
+  // with yet cannot index into the wrong track list.
   const select = useCallback(
-    (index) => {
+    (playlistId, index) => {
+      if (playlistId !== engine.current.playlistId) {
+        switchPlaylist(playlistId, { index, play: true })
+        return
+      }
+      // Play the track at `index`. Tapping the row that is already loaded is
+      // treated as play/pause, which is what people expect from a tracklist.
       if (index === engine.current.index) {
         toggle()
         return
       }
       load(index, true)
     },
-    [load, toggle],
+    [load, switchPlaylist, toggle],
   )
 
   const seek = useCallback(
@@ -258,9 +349,9 @@ export function PlayerProvider({ children }) {
     const next = !engine.current.shuffle
     commit({
       shuffle: next,
-      order: buildOrder(tracks.length, engine.current.index, next),
+      order: buildOrder(activePlaylist()?.tracks.length ?? 0, engine.current.index, next),
     })
-  }, [commit])
+  }, [activePlaylist, commit])
 
   const cycleRepeat = useCallback(() => {
     const next = REPEAT_MODES[(REPEAT_MODES.indexOf(engine.current.repeat) + 1) % REPEAT_MODES.length]
@@ -324,12 +415,12 @@ export function PlayerProvider({ children }) {
   // time readout are populated before the first press.
   useEffect(() => {
     const element = audioRef.current
-    const first = tracks[0]
+    const first = activePlaylist()?.tracks[0]
     if (element && first && !element.src) {
       element.src = first.src
       element.load()
     }
-  }, [])
+  }, [activePlaylist])
 
   // Apply the persisted volume/mute to the element once it exists.
   useEffect(() => {
@@ -349,12 +440,13 @@ export function PlayerProvider({ children }) {
           muted: state.muted,
           repeat: state.repeat,
           shuffle: state.shuffle,
+          playlistId: state.playlistId,
         }),
       )
     } catch {
       // Storage blocked or full: preferences last for this session only.
     }
-  }, [state.volume, state.muted, state.repeat, state.shuffle])
+  }, [state.volume, state.muted, state.repeat, state.shuffle, state.playlistId])
 
   // Media Session: OS media keys, lock-screen controls and headphone buttons.
   useEffect(() => {
@@ -391,14 +483,15 @@ export function PlayerProvider({ children }) {
   // Track metadata for lock screens and OS notifications.
   useEffect(() => {
     if (typeof navigator === 'undefined' || !('mediaSession' in navigator)) return
-    const track = tracks[state.index]
+    const current = getPlaylist(state.playlistId)
+    const track = current?.tracks[state.index]
     if (!track || typeof MediaMetadata === 'undefined') return
     navigator.mediaSession.metadata = new MediaMetadata({
       title: track.title,
       artist: track.artist,
-      album: playlist.title,
+      album: current.title,
     })
-  }, [state.index])
+  }, [state.index, state.playlistId])
 
   useEffect(() => {
     if (typeof navigator === 'undefined' || !('mediaSession' in navigator)) return
@@ -408,11 +501,21 @@ export function PlayerProvider({ children }) {
   // Stop audio if the provider itself is torn down (a full app unmount).
   useEffect(() => () => audioRef.current?.pause(), [])
 
+  // The loaded playlist is derived from the id rather than stored as its own
+  // object, so the active id and the track list can never drift apart. EMPTY is
+  // a module-level constant so a library with no tracks keeps a stable reference
+  // across renders.
+  const playlist = getPlaylist(state.playlistId)
+  const tracks = playlist?.tracks ?? EMPTY
+  const track = tracks[state.index]
+
   const value = useMemo(
     () => ({
+      playlists,
       playlist,
       tracks,
-      track: tracks[state.index],
+      track,
+      activeId: state.playlistId,
       index: state.index,
       isPlaying: state.isPlaying,
       loading: state.loading,
@@ -431,6 +534,7 @@ export function PlayerProvider({ children }) {
       next,
       previous,
       select,
+      switchPlaylist,
       seek,
       seekBy,
       setVolume,
@@ -439,6 +543,7 @@ export function PlayerProvider({ children }) {
       cycleRepeat,
     }),
     [
+      state.playlistId,
       state.index,
       state.isPlaying,
       state.loading,
@@ -457,6 +562,7 @@ export function PlayerProvider({ children }) {
       next,
       previous,
       select,
+      switchPlaylist,
       seek,
       seekBy,
       setVolume,

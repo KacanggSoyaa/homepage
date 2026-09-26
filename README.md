@@ -31,7 +31,7 @@ to Vercel, Netlify, GitHub Pages, or any static host.
 | Blog / threads | `src/data/blog.js` (+ photos in `src/components/img/blog/`) |
 | Bio / education | `src/pages/About.jsx` |
 | Hero text | `src/pages/Home.jsx` |
-| Music / tracks | `public/audio/` + `scripts/import-audio.mjs` (generates `src/data/audio-manifest.js`) |
+| Music / tracks | `public/audio/<playlist>/*.mp3` + `node scripts/import-audio.mjs` (generates `src/data/audio-manifest.js`; titles live in `src/data/playlist.js`) |
 | Contact links (email, GitHub, LinkedIn) | `src/components/Footer.jsx`, `src/pages/Contact.jsx` |
 
 Every placeholder is marked with a `// TODO:` comment.
@@ -95,73 +95,166 @@ Other options:
 
 See `src/components/img/blog/README.md` for the full documentation.
 
-## Music: adding your own songs
+## Music: playlists and songs
 
 The `/music` page is a real player — shuffle, loop, seek, volume, and a persistent
-dock — and it plays whatever audio sits in `public/audio`. Only one thing controls
-what shows up in the tracklist: the generated manifest.
+dock. It plays whatever audio sits in `public/audio`, and one generated file
+decides what shows up: `src/data/audio-manifest.js`.
 
-**1. Drop your files into `public/audio`**
+**One folder is one playlist**, and the folder tree is the whole library:
 
 ```
-public/audio/Artist - Title.mp3
+public/audio/mood/James Arthur - Car's Outside.mp3   ->  /music/mood
+public/audio/focus/Ominous Tidings.mp3                ->  /music/focus
 ```
 
-Naming them `Artist - Title` matters: the importer splits on the first dash and
-fills in both fields, so `Mahalini - Sial.mp3` becomes artist *Mahalini*, title
-*Sial*. Without the dash the whole filename becomes the title.
+The folder name is the playlist's id, and the id is the last part of its URL, so
+each playlist is linkable and the browser's back button moves between them. `/music`
+with no id opens whichever playlist you had last.
+
+### Adding a playlist
+
+1. Make a folder: `public/audio/focus`
+2. Drop the audio in
+3. Run `node scripts/import-audio.mjs`
+4. Give it a title in `src/data/playlist.js` (optional — the folder name is used
+   until you do)
+
+The importer picks up every folder in `public/audio` each time it runs, so this
+is the whole procedure for the second playlist, the third, and every one after.
+
+### Adding songs to a playlist you already have
+
+Same thing — drop the files into that playlist's folder and re-run:
+
+```bash
+node scripts/import-audio.mjs
+```
+
+That never re-encodes and never rewrites your titles: it re-reads the folders and
+regenerates the track lists. It takes a second.
+
+### Importing a folder of music from elsewhere
+
+To encode audio that isn't in the project yet, point the importer at it and name
+the playlist:
+
+```bash
+node scripts/import-audio.mjs "~/Music/late-night" --id late-night
+```
+
+The files are encoded into `public/audio/late-night/` and the playlist is added.
+Add `--limit 150` for 2:30 excerpts, `--quality small|medium|high` to pick a
+bitrate.
+
+**The source has to be outside the project.** The importer writes into
+`public/audio/`, so a source inside it would hand ffmpeg the same file as both
+input and output — the one way to lose the only copy of a track. It refuses
+rather than trying:
+
+```
+The source is inside public/audio, so encoding would write each file onto itself.
+```
+
+### If your songs don't play
+
+Audio sitting in `public/audio` that isn't listed in the manifest is **invisible**.
+The player reads the manifest, not the folder, so tracks missing from it have no
+play button, no duration, and no row — and `/music` renders its "nothing queued"
+panel instead of a player. Having the files on disk is not enough; the manifest
+is what makes them playable.
+
+So if a folder is right but the page is empty, re-run the importer. The quickest
+check is to open `src/data/audio-manifest.js` and look at `playlists: [...]` — if
+the list is empty or a playlist is missing from it, nothing can play. Use
+`--dry-run` first to see what it *would* write.
+
+Other things that look like "it doesn't play":
+
+| Symptom | Cause |
+|---|---|
+| A playlist is missing from the switcher | Its folder has no audio in it. The importer skips empty folders and says so. |
+| Rows appear, pressing play shows "This track could not be loaded." | A 404 — the file named in the manifest isn't in `public/audio`. Renaming a file means re-running the importer. |
+| Nothing happens on first load, works after a click | Expected. Browsers block audio that isn't tied to a user gesture; every control here starts from a click. |
+| Player works locally, 404s on the deployed site | The audio wasn't in the build. Re-run `npm run build` — `public/` is copied into `dist/`, and anything added after a build is missing. |
+| A track's time shows 0:00 until you press play | The duration is read from the file by the browser. It fills in on load. |
+
+### Naming tracks
+
+The filename becomes the display title, so name files the way you want them read
+in the tracklist. A leading track number is stripped:
+
+| Filename | Shown as |
+|---|---|
+| `01 - Ominous Tidings.mp3` | Ominous Tidings |
+| `03_track.mp3` | track |
+| `2001.mp3` | 2001 (numbers alone are left alone) |
+| `Mahalini - Sial.mp3` | Mahalini - Sial |
+
+The title keeps the artist prefix as typed above — the importer does **not** split
+`Artist - Title` on the dash. Track artist comes from the playlist's `artist` in
+`src/data/playlist.js`, so a mixed set is usually best labelled `Various artists`.
 
 MP3, M4A, AAC, WAV, FLAC, OGG, OPUS and WEBM are all read.
 
-**2. Empty the folder if you don't want the old set**
+### Removing a playlist
 
-The importer reads the **whole** folder, so the CC0 tracks that ship with the site
-are still in there and would get merged in. To start fresh, move them out first:
-
-```bash
-mv public/audio/* ~/somewhere-else/          # macOS / Linux
-Move-Item "public\audio\*" "C:\somewhere-else\"   # Windows PowerShell
-```
-
-**3. Run the importer**
-
-```bash
-node scripts/import-audio.mjs "public/audio" --title "My Playlist"
-```
-
-That re-encodes everything in the folder and rewrites `src/data/audio-manifest.js`.
+Delete the folder, re-run the importer, and remove its entry from
+`src/data/playlist.js`. To delete the audio too, add `--clean` — it prunes files
+in `public/audio` that no playlist references. That is permanent, so run
+`--dry-run --clean` first to see the list.
 
 ### Options
 
 | Flag | What it does |
 |---|---|
-| `--title <text>` | Playlist title shown in the player |
-| `--artist <text>` | Credit one artist for every track |
-| `--description <text>` | One-line blurb under the title |
+| `--id <slug>` | Playlist id for an imported source (default: its folder name) |
 | `--quality <name>` | `small` (mono 64k) · `medium` (stereo 128k, default) · `high` (stereo 256k) |
 | `--limit <seconds>` | Trim each track to an excerpt, with a 1.5s fade |
 | `--order <file>` | Pin the running order from a newline-separated list |
 | `--normalize` | Even out loudness across tracks (single pass) |
-| `--no-encode` | Files are already encoded — just rebuild the manifest |
-| `--clean` | Delete `public/audio` files the new manifest doesn't reference |
-| `--allow-empty` | Permit a folder with no audio — writes an empty library |
+| `--no-encode` | Don't encode; the source must already be in `public/audio` |
+| `--clean` | Delete `public/audio` files no playlist references |
+| `--allow-empty` | Keep a playlist whose folder holds no audio |
 | `--dry-run` | Report everything, write nothing |
+| `--help` | List the flags and exit |
 
 Run with `--dry-run` first when you're unsure how it'll read your filenames — it
-prints every title, artist, and output size without touching a file.
+prints every playlist, title and output size without touching a file.
+
+There is deliberately no `--title` or `--artist` flag. Those belong to a playlist
+rather than to an import run, and with more than one playlist a single flag could
+only ever name one of them, so they live in `src/data/playlist.js` instead.
 
 ### Keeping the deploy small
 
-Full-length tracks are big. A 14-song set of 5 MB encodes is ~76 MB shipped on
-every deploy, which is most of your site. Two flags fix that:
+Everything in `public/audio` is copied into `dist/` and re-uploaded on every
+deploy, and full-length tracks are big. The two full-length tracks currently in
+the repo are ~11 MB; a 14-song set of 5 MB encodes would be ~76 MB, which is most
+of your site.
+
+`--no-encode` never shrinks anything, so to actually reduce the weight, re-encode
+from a copy kept **outside** the project:
 
 ```bash
-node scripts/import-audio.mjs "public/audio" --title "My Playlist" --limit 210 --quality small
+# 1. copy the originals out of the project first
+Copy-Item "public\audio\mood\*" "$HOME\Music\mood\"        # Windows PowerShell
+
+# 2. re-encode from there — the files land back in public/audio/mood
+node scripts/import-audio.mjs "$HOME/Music/mood" --id mood --limit 210 --quality medium
 ```
 
-That trims to 3:30 excerpts at mono 64 kbps — roughly 8 MB for the same 14 songs.
-`--quality small` is mono, so it's fine for ambient/drone material but thin for
-anything with bass in it; use `--quality medium` as the safer default.
+That trims each track to a 3:30 excerpt with a fade at both ends, at stereo
+128 kbps. The new encodes share the originals' filenames, so they replace them in
+place; add `--clean` to also delete files no playlist references. Drop
+`--limit` to keep full lengths and shrink only the bitrate.
+
+`--quality small` is mono 64 kbps — fine for ambient/drone material, thin for
+anything with bass in it. `medium` is the safer default.
+
+Note the source in that command is *not* `public/audio`. Re-encoding writes to
+that same tree, so importing from inside it would hand ffmpeg each file as both
+input and output; the importer refuses rather than risk the only copy of a track.
 
 ### Custom running order
 
@@ -169,7 +262,7 @@ anything with bass in it; use `--quality medium` as the safer default.
 keeps its alphabetical position after the listed tracks rather than being dropped.
 
 ```bash
-node scripts/import-audio.mjs "public/audio" --order my-order.txt
+node scripts/import-audio.mjs "~/Music/mood" --id mood --order my-order.txt
 ```
 
 `#` starts a comment, and blank lines are ignored — see `scripts/cc0-order.txt`
@@ -181,35 +274,69 @@ An empty library is a supported state. `/music` renders a short "nothing queued"
 panel instead of a player, and the dock is not mounted at all, so an empty
 library costs the page no dead controls.
 
-```bash
-node scripts/import-audio.mjs public/audio --allow-empty --no-encode --title "Music"
+Folders with no audio in them are skipped, so a playlist you have created but not
+filled yet costs nothing — it just doesn't appear in the switcher until there's
+something in it. Pass `--allow-empty` to keep those as empty playlists, which
+render a short "this playlist is empty" note instead.
+
+### Naming a playlist
+
+Titles, artists, descriptions and licences are hand-maintained in
+`src/data/playlist.js`, keyed by playlist id:
+
+```js
+export const playlistMeta = {
+  mood: {
+    title: 'Mood',
+    artist: 'Various artists',
+    description: 'The songs I keep coming back to.',
+  },
+  focus: {
+    title: 'Deep Focus',
+    artist: 'Various artists',
+    // Only for audio that genuinely is public domain or CC-licensed. Left out,
+    // the page says the audio is hosted for personal listening and not offered
+    // for redistribution, which is the honest wording for anything you own.
+    // license: 'CC0 1.0 Universal',
+    // licenseUrl: 'https://creativecommons.org/publicdomain/zero/1.0/',
+    // source: 'https://wherever-it-came-from',
+  },
+}
 ```
 
-`--allow-empty` is required on purpose — without it the importer stops on a
-folder with no audio, so a mistyped path can't silently wipe your tracklist.
-Add `--clean` to also delete whatever is sitting in `public/audio`.
+A playlist with no entry here still works: the title falls back to the folder
+name read as words, so `late-night` shows as "Late Night".
 
-### Restoring the CC0 set
-
-The set that ships with the site is *free archive of ambient music* by josh korda,
-under CC0 1.0, trimmed to 2:30 mono 64 kbps. `scripts/cc0-order.txt` holds the
-curated running order and documents the exact command to rebuild it.
+Keeping this separate from the manifest is the point — the importer rewrites
+`src/data/audio-manifest.js` on every run and never reads or writes
+`src/data/playlist.js`, so wording you chose survives every future import.
 
 ### Notes
 
 - `src/data/audio-manifest.js` is **generated** — don't hand-edit it, or your next
-  import will overwrite your changes. Page copy lives in `src/data/playlist.js`.
+  import will overwrite your changes. Titles and licences live in
+  `src/data/playlist.js`.
+- Two folders that normalise to the same id ("Late Night" and "late-night") are
+  refused rather than silently shadowing each other, since the manifest is keyed
+  by id and the id is the URL.
 - Importing needs **ffmpeg**, which ships with the project as the `ffmpeg-static`
   dev dependency — so a fresh `npm install` is all you need. The importer looks
   for it in this order: the `FFMPEG_PATH` environment variable, `ffmpeg` on your
   `PATH`, `node_modules/ffmpeg-static/`, then a legacy copy under `%TEMP%`. If it
   can't find one it prints the fix and stops without writing anything.
-- `--clean` **deletes** anything in `public/audio` the new manifest doesn't
-  reference. It's safe on a normal import, but don't reach for it expecting a
-  dry run to protect anything.
-- Importing is slow — re-encoding 14 full tracks takes a few minutes. Use
-  `--no-encode` to skip straight to the manifest when the files are already the
-  encodes you want.
+- `--clean` **deletes** audio in `public/audio` that no playlist references. It
+  leaves non-audio files and empty folders alone. Run `--dry-run --clean` first
+  to see the list — a dry run does not protect you from a real one.
+- Re-encoding a folder of full-length tracks takes a few minutes. A plain
+  `node scripts/import-audio.mjs` re-reads the folders without encoding anything
+  and finishes in a second.
+- Any change to `public/audio` — adding, renaming, deleting — needs a fresh import
+  to reach the player. The manifest holds the filenames, so a rename without a
+  re-import is a 404.
+- **The audio is git-ignored.** `public/audio/*/*.mp3` and friends are excluded on
+  purpose: these are recordings you have no right to redistribute, so they stay
+  out of the repository and out of any deploy made from it. Build locally with
+  `npm run build` and upload `dist/`, which does contain the audio.
 
 ## Notes
 

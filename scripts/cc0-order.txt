@@ -1,13 +1,24 @@
-# Running order for the CC0 set that shipped with the site.
+# Running order for the CC0 set that originally shipped with the site.
 # One filename per line; blank lines and # comments ignored.
 #
-# Regenerate the manifest for this set with:
-#   node scripts/import-audio.mjs public/audio --no-encode \
-#     --order scripts/cc0-order.txt \
-#     --title "Free Archive of Ambient Music" --artist "josh korda" \
-#     --license "CC0 1.0 Universal" \
-#     --license-url "https://creativecommons.org/publicdomain/zero/1.0/" \
-#     --source "https://archive.org/details/FreeArchiveOfAmbientMusic"
+# This file is a worked example of --order: put it beside the audio you are
+# importing and pass it in. The tracks below are not in the repo any more — they
+# are here to show the format, and to record where the set came from.
+#
+# Titles, artists and licences are NOT importer flags any more. They live in
+# src/data/playlist.js, keyed by playlist id, so re-importing never overwrites
+# them. The set below would be:
+#
+#   focus: {
+#     title: 'Free Archive of Ambient Music',
+#     artist: 'josh korda',
+#     license: 'CC0 1.0 Universal',
+#     licenseUrl: 'https://creativecommons.org/publicdomain/zero/1.0/',
+#     source: 'https://archive.org/details/FreeArchiveOfAmbientMusic',
+#   },
+#
+# with the audio imported as:
+#   node scripts/import-audio.mjs "C:\path\to\FreeArchiveOfAmbientMusic" --id focus --limit 150 --quality small
 Stasis.mp3
 Ominous Tidings.mp3
 Spacey Psychedelic Ambience.mp3

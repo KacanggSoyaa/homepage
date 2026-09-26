@@ -90,10 +90,13 @@ export default function PlayerDock() {
 
               <VolumeControl className="hidden sm:flex" />
 
-              {/* Jump to the full tracklist. Doubles as a readout of the active
-                  modes for anyone who has not noticed the button colours. */}
+              {/* Jump to the full tracklist — of the playlist that is playing,
+                  not of whichever one the music page last showed, since the
+                  dock can be reached from any page. Doubles as a readout of the
+                  active modes for anyone who has not noticed the button
+                  colours. */}
               <Link
-                to="/music"
+                to={`/music/${playlist.id}`}
                 title={`Shuffle ${shuffle ? 'on' : 'off'}, ${REPEAT_WORDS[repeat]}`}
                 className="hidden md:flex items-center gap-1.5 shrink-0 font-mono text-xs text-ink-600 dark:text-paper-200/70 hover:text-amber transition-colors"
               >

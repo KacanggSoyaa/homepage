@@ -94,8 +94,12 @@ export default function App({ sections }) {
             />
             {/* About page lives on its own route, separate from the main scroll */}
             <Route path="/about" element={<About />} />
-            {/* Music page: the self-hosted player + tracklist on its own route */}
+            {/* Music page: the self-hosted player + tracklist on its own route.
+                The optional :id picks the playlist — /music opens the one that
+                was loaded last, /music/mood opens Mood. Both render the same
+                page, which reads the id and asks the player to switch. */}
             <Route path="/music" element={<Music />} />
+            <Route path="/music/:id" element={<Music />} />
             {/* Full detail page for a single blog thread (/blog/:id) */}
             <Route path="/blog/:id" element={<Thread />} />
           </Routes>

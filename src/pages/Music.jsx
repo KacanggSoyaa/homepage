@@ -3,10 +3,18 @@
 // The audio is served from /audio, so this page is a real player: the panel
 // below drives the same engine as the persistent dock, and every row of the
 // tracklist is a play button.
+//
+// There is one page for the whole library, and the playlist it shows is the id
+// in the URL: /music opens whichever playlist was loaded last, /music/focus
+// opens Focus. Opening a playlist loads it in the player, because the panel here
+// *is* the player — a tracklist for one playlist above a now-playing panel for
+// another would be a lie about what the transport buttons do.
 
 import { useEffect, useRef } from 'react'
+import { useParams } from 'react-router-dom'
 import { usePlayer, formatTime } from '../player/PlayerContext.jsx'
 import TrackArt from '../components/TrackArt.jsx'
+import PlaylistSwitcher from '../components/PlaylistSwitcher.jsx'
 import ScrollReveal from '../components/ScrollReveal.jsx'
 import { ExternalLinkIcon, QueueIcon } from '../components/Icons.jsx'
 import { NowPlayingBars, Scrubber, Transport } from '../components/PlayerControls.jsx'
@@ -18,9 +26,11 @@ const REPEAT_WORDS = {
 }
 
 export default function Music() {
+  const { id } = useParams()
   const {
+    playlists,
     playlist,
-    tracks,
+    activeId,
     track,
     index,
     isPlaying,
@@ -30,7 +40,31 @@ export default function Music() {
     repeat,
     shuffle,
     select,
+    switchPlaylist,
   } = usePlayer()
+
+  // An id in the URL wins over the remembered playlist, and it wins immediately
+  // rather than after an effect: `shown` is what the page renders, so following
+  // a link to /music/focus never paints Mood's tracklist first.
+  const requested = playlists.find((entry) => entry.id === id) || null
+  const shown = requested || playlist
+  const tracks = shown?.tracks ?? []
+
+  // Until the engine has caught up with the URL, `index` refers to the previously
+  // loaded playlist, so the highlighted row is only meaningful when they agree.
+  const isLoaded = shown?.id === activeId
+
+  // Load the playlist the URL names. Swapping playlists mid-song carries on
+  // playing when the current track is in both, and otherwise opens the new
+  // playlist's first track — passing the current playback state along so a
+  // switch that interrupts music tries to resume it rather than stranding it.
+  const wasPlaying = useRef(false)
+  wasPlaying.current = isPlaying
+  useEffect(() => {
+    if (requested && requested.id !== activeId) {
+      switchPlaylist(requested.id, { play: wasPlaying.current })
+    }
+  }, [requested, activeId, switchPlaylist])
 
   // The card scrolls internally, so the row that is playing has to be brought
   // back into view as the playlist advances. Scrolling the container directly
@@ -58,18 +92,22 @@ export default function Music() {
           What I'm listening to
         </h1>
         <p className="text-ink-700 dark:text-paper-200/80 max-w-xl">
-          A playlist I keep coming back to, hosted on this site rather than
-          streamed from somewhere else. Shuffle it, loop it, scrub around — it
+          Playlists I keep coming back to, hosted on this site rather than
+          streamed from somewhere else. Shuffle one, loop it, scrub around — it
           is meant to be played.
         </p>
       </ScrollReveal>
 
+      {/* Playlist picker. Renders nothing until there is a second playlist to
+          pick between, so a one-playlist library shows no chrome at all. */}
+      <PlaylistSwitcher className="mt-8" />
+
       {/* An empty library is a valid state, not an error: the importer can
-          write a manifest with no tracks, and there is no audio for the panel,
-          the tracklist or the licence note to describe. Rather than render a
-          player with an undefined track, the page says what is going on and how
-          to fill it. */}
-      {tracks.length === 0 ? (
+          write a manifest with no playlists, and there is no audio for the
+          panel, the tracklist or the licence note to describe. Rather than
+          render a player with an undefined track, the page says what is going
+          on and how to fill it. */}
+      {playlists.length === 0 ? (
         <ScrollReveal delay={80}>
           <div className="mt-10 glass rounded-lg border border-ink-200/15 dark:border-paper-50/10 px-6 py-10 sm:px-10 sm:py-14">
             <h2 className="font-mono text-lg font-semibold">nothing queued</h2>
@@ -78,8 +116,25 @@ export default function Music() {
               later appears here automatically, with the full set of controls.
             </p>
             <p className="mt-4 font-mono text-xs text-ink-600 dark:text-paper-200/50">
-              to add tracks: drop audio into <span className="text-amber">public/audio</span> and
-              run <span className="text-amber">node scripts/import-audio.mjs public/audio</span>
+              to add a playlist: make a folder in <span className="text-amber">public/audio</span>,
+              drop audio in, and run <span className="text-amber">node scripts/import-audio.mjs</span>
+            </p>
+          </div>
+        </ScrollReveal>
+      ) : !track || tracks.length === 0 ? (
+        /* The playlist exists and it is empty, which is a different situation
+           from an empty library: the folder is there, the audio is not. The
+           check is on `track` as well as on the visible list, because the panel
+           above describes the loaded playlist and needs a track to describe. */
+        <ScrollReveal delay={80}>
+          <div className="mt-10 glass rounded-lg border border-ink-200/15 dark:border-paper-50/10 px-6 py-10 sm:px-10 sm:py-14">
+            <h2 className="font-mono text-lg font-semibold">{shown.title} is empty</h2>
+            <p className="mt-2 text-sm leading-relaxed text-ink-700 dark:text-paper-200/80 max-w-xl">
+              This playlist has no audio in it yet. Add a file to{' '}
+              <span className="font-mono text-xs text-amber">
+                public/audio/{shown.id}
+              </span>{' '}
+              and re-run the importer.
             </p>
           </div>
         </ScrollReveal>
@@ -137,9 +192,12 @@ export default function Music() {
             </div>
 
             {/* Plain-language readout of the two mode toggles, since a "1" on
-                the repeat icon is not self-explanatory. */}
+                the repeat icon is not self-explanatory. The count is the loaded
+                playlist's: the transport buttons act on that one, not on
+                whichever the URL names. */}
             <p className="mt-4 text-center font-mono text-[11px] text-ink-600 dark:text-paper-200/50">
-              shuffle {shuffle ? 'on' : 'off'} · {REPEAT_WORDS[repeat]} · {tracks.length} tracks
+              shuffle {shuffle ? 'on' : 'off'} · {REPEAT_WORDS[repeat]} ·{' '}
+              {playlist.tracks.length} tracks
             </p>
           </div>
         </div>
@@ -182,7 +240,7 @@ export default function Music() {
           <div className="flex items-center gap-2 px-4 py-3 bg-ink-900/5 dark:bg-paper-50/5 border-b border-ink-200/10 dark:border-paper-50/10">
             <QueueIcon width="15" height="15" className="text-amber shrink-0" />
             <span className="font-mono text-xs text-ink-600 dark:text-paper-200/60 truncate">
-              {playlist.title.toLowerCase()}.m3u
+              {shown.title.toLowerCase()}.m3u
             </span>
             <span className="ml-auto font-mono text-[11px] text-ink-600 dark:text-paper-200/50 shrink-0">
               {tracks.length} tracks
@@ -197,7 +255,9 @@ export default function Music() {
                 otherwise make for a very long, very empty scroll. */}
             <ul className="grid sm:grid-cols-2 gap-x-8 gap-y-0.5">
               {tracks.map((entry, position) => {
-                const isCurrent = position === index
+                // Gated on the engine having caught up with the URL, so the
+                // highlight never lands on row 2 of a list it isn't playing yet.
+                const isCurrent = isLoaded && position === index
                 return (
                   <li key={entry.id}>
                     <button
@@ -206,7 +266,7 @@ export default function Music() {
                         else rowRefs.current.delete(position)
                       }}
                       type="button"
-                      onClick={() => select(position)}
+                      onClick={() => select(shown.id, position)}
                       aria-current={isCurrent ? 'true' : undefined}
                       aria-label={`${isCurrent && isPlaying ? 'Pause' : 'Play'} ${entry.title}`}
                       className={`group w-full text-left flex items-center gap-3 px-3 py-2 rounded-md border transition-colors ${
@@ -256,34 +316,34 @@ export default function Music() {
       </ScrollReveal>
 
       {/* Where the audio comes from and what may be done with it. The wording
-          follows the manifest: a licence is only claimed when the importer was
-          given one, so audio the site owner owns never gets described with a
-          public-domain grant that does not apply to it. */}
+          follows the playlist's own metadata: a licence is only claimed when one
+          is set in src/data/playlist.js, so audio the site owner owns never gets
+          described with a public-domain grant that does not apply to it. */}
       <ScrollReveal delay={160}>
         <div className="mt-14 border-l-2 border-amber/40 pl-4">
           <h2 className="font-mono text-sm font-semibold text-amber">source &amp; licence</h2>
-          {playlist.license ? (
+          {shown.license ? (
             <p className="mt-2 text-sm leading-relaxed text-ink-700 dark:text-paper-200/80 max-w-2xl">
-              Every track here is <strong>{playlist.title}</strong> by {playlist.artist},
+              Every track in <strong>{shown.title}</strong> is by {shown.artist},
               released under{' '}
-              {playlist.licenseUrl ? (
+              {shown.licenseUrl ? (
                 <a
-                  href={playlist.licenseUrl}
+                  href={shown.licenseUrl}
                   target="_blank"
                   rel="noreferrer noopener"
                   className="text-amber hover:text-amber-light underline underline-offset-2"
                 >
-                  {playlist.license}
+                  {shown.license}
                 </a>
               ) : (
-                <span>{playlist.license}</span>
+                <span>{shown.license}</span>
               )}
               , so the files are served straight from this site with no account,
               no subscription, and no preview cut-offs.
             </p>
           ) : (
             <p className="mt-2 text-sm leading-relaxed text-ink-700 dark:text-paper-200/80 max-w-2xl">
-              <strong>{playlist.title}</strong> by {playlist.artist}, hosted here so
+              <strong>{shown.title}</strong> by {shown.artist}, hosted here so
               the player keeps real shuffle, loop, seek and volume controls. The
               audio is served for personal listening; it is not offered for
               redistribution, and the files stay the property of whoever made

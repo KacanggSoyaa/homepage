@@ -18,6 +18,19 @@ dist
 # Local files
 *.local
 
+# Audio for the music page. The tracks are recordings you don't own the rights
+# to redistribute, so they stay out of the repository and out of any deploy made
+# from it. The site is built locally (npm run build) and the resulting dist/ is
+# what gets uploaded, so the player still works — the files are only ever absent
+# from git itself. Keep public/audio/README.md tracked if you add one.
+public/audio/*/*.mp3
+public/audio/*/*.m4a
+public/audio/*/*.flac
+public/audio/*/*.wav
+public/audio/*/*.ogg
+public/audio/*/*.opus
+public/audio/*/*.aac
+
 # Logs
 *.log
 npm-debug.log*

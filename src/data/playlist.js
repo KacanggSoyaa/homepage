@@ -1,23 +1,78 @@
-// playlist.js — hand-maintained half of the site's music library.
+// playlist.js — the hand-maintained half of the site's music library.
 //
-// The track list itself is generated: src/data/audio-manifest.js is written by
-// scripts/import-audio.mjs, which encodes whatever audio you point it at and
-// keeps public/audio in step. This file holds the parts a human curates.
+// The audio and the track lists are generated: scripts/import-audio.mjs writes
+// src/data/audio-manifest.js from the folders under public/audio, one folder per
+// playlist. This file holds the parts a human curates — a playlist's title, who
+// it's by, where it came from, how it may be used — keyed by playlist id, which
+// is the folder name under public/audio:
 //
-// To change the songs, run the importer against a folder of audio you have the
-// rights to redistribute:
+//   public/audio/mood    ->   mood:   { title: 'Mood', artist: 'Various artists' }
+//   public/audio/focus   ->   focus:  { title: 'Deep Focus', artist: 'Various artists' }
 //
-//   node scripts/import-audio.mjs ~/Music/my-playlist --title "Mood"
+// Keeping the wording here rather than in the manifest is what makes
+// re-importing audio safe: the importer rewrites the track lists and never reads
+// or writes this file, so a title you chose survives every future import.
 //
-// The set that shipped with the site was "free archive of ambient music" by
-// josh korda, released under CC0 1.0 Universal, re-encoded to 2:30 mono
-// 64 kbps excerpts — about 14 MB for twelve tracks. Regenerate that exact
-// state with:
-//
-//   node scripts/import-audio.mjs --title ... --license "CC0 1.0 Universal"
+// A folder with no entry here still works. The title falls back to the id read
+// as words, so "late-night" shows as "Late Night" and a brand-new playlist
+// appears in the switcher the moment it is imported.
 
-import { manifest } from './audio-manifest.js'
+import { library } from './audio-manifest.js'
 
-export const playlist = manifest
+const UNKNOWN = 'Unknown artist'
 
-export const tracks = manifest.tracks
+export const playlistMeta = {
+  mood: {
+    title: 'Mood',
+    artist: 'Various artists',
+    description: 'The songs I keep coming back to, hosted here rather than streamed.',
+  },
+  focus: {
+    title: 'Deep Focus',
+    artist: 'Various artists',
+    description: 'Instrumental, for working through something long.',
+  },
+}
+
+// "late-night" -> "Late Night". Only ever the fallback for a title: anything set
+// in playlistMeta above is used exactly as written.
+const humanize = (id) =>
+  id
+    .split('-')
+    .filter(Boolean)
+    .map((word) => word[0].toUpperCase() + word.slice(1))
+    .join(' ') || id
+
+/**
+ * Every playlist on the site, generated track lists merged with the metadata
+ * above. The id is also the URL: /music/mood, /music/focus.
+ */
+export const playlists = library.playlists.map((generated) => {
+  const meta = playlistMeta[generated.id] || {}
+  const artist = meta.artist || UNKNOWN
+  return {
+    id: generated.id,
+    title: meta.title || humanize(generated.id),
+    artist,
+    description: meta.description || `${generated.tracks.length} tracks, hosted on this site.`,
+    license: meta.license || null,
+    licenseUrl: meta.licenseUrl || null,
+    source: meta.source || null,
+    // Track artists come from the playlist, since the importer reads filenames
+    // and not ID3 tags. Spreading `artist` onto each track keeps every consumer
+    // — the tracklist rows, the dock, the media session — reading one field.
+    tracks: generated.tracks.map((track) => ({ ...track, artist: track.artist || artist })),
+  }
+})
+
+const byId = new Map(playlists.map((playlist) => [playlist.id, playlist]))
+
+/**
+ * The playlist with this id, or the first one when the id is unknown.
+ *
+ * The fallback is what keeps a stale bookmark or a renamed folder from rendering
+ * an empty page: /music/late-night still opens the library.
+ */
+export const getPlaylist = (id) => byId.get(id) || playlists[0] || null
+
+export const hasPlaylist = (id) => byId.has(id)
