@@ -5,24 +5,28 @@
 // Links rather than buttons, so the back button, a middle click and a copied
 // link all behave the way the rest of the site does.
 //
-// The highlighted playlist is the one loaded in the player, not the one in the
-// URL, because /music with no id opens whichever playlist you had last.
+// Switching is a browse, not a playback change: the loaded track keeps playing
+// while you look at another playlist. So the highlight follows the playlist on
+// screen (passed in as viewingId) rather than the one loaded in the player,
+// which can now be a different one.
 
 import { Link } from 'react-router-dom'
 import { usePlayer } from '../player/PlayerContext.jsx'
 import { QueueIcon } from './Icons.jsx'
 
-export default function PlaylistSwitcher({ className = '' }) {
+export default function PlaylistSwitcher({ className = '', viewingId = null }) {
   const { playlists, activeId } = usePlayer()
 
   // One playlist is not a choice, so there is nothing to switch between. The
   // row appears by itself when a second folder shows up in public/audio.
   if (playlists.length < 2) return null
 
+  const current = viewingId || activeId
+
   return (
     <nav aria-label="Playlists" className={`flex flex-wrap items-center gap-2 ${className}`}>
       {playlists.map((playlist) => {
-        const isActive = playlist.id === activeId
+        const isActive = playlist.id === current
         return (
           <Link
             key={playlist.id}

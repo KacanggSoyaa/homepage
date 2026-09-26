@@ -54,17 +54,23 @@ export default function Music() {
   // loaded playlist, so the highlighted row is only meaningful when they agree.
   const isLoaded = shown?.id === activeId
 
-  // Load the playlist the URL names. Swapping playlists mid-song carries on
-  // playing when the current track is in both, and otherwise opens the new
-  // playlist's first track — passing the current playback state along so a
-  // switch that interrupts music tries to resume it rather than stranding it.
-  const wasPlaying = useRef(false)
-  wasPlaying.current = isPlaying
+  // Browsing to another playlist must never interrupt what is playing. The URL
+  // decides which tracklist is on screen; the player keeps whatever it has
+  // loaded until something explicitly asks for a change — a row tap, the dock,
+  // or the OS media keys.
+  //
+  // The one exception is arriving with nothing playing: there the URL picks what
+  // to preload, so a shared /music/galau link opens Galau instead of whichever
+  // playlist happened to be remembered. It never autoplays, and it is latched
+  // with a ref so that pausing a moment later cannot retroactively swap the
+  // loaded playlist out from under the dock.
+  const adopted = useRef(false)
   useEffect(() => {
-    if (requested && requested.id !== activeId) {
-      switchPlaylist(requested.id, { play: wasPlaying.current })
-    }
-  }, [requested, activeId, switchPlaylist])
+    if (adopted.current) return
+    adopted.current = true
+    if (!requested || requested.id === activeId || isPlaying) return
+    switchPlaylist(requested.id, { play: false })
+  }, [requested, activeId, isPlaying, switchPlaylist])
 
   // The card scrolls internally, so the row that is playing has to be brought
   // back into view as the playlist advances. Scrolling the container directly
@@ -74,6 +80,10 @@ export default function Music() {
 
   useEffect(() => {
     const scroller = scrollerRef.current
+    // `index` belongs to the loaded playlist, so scrolling to that row only makes
+    // sense while the list on screen is the loaded one. Browsing to another
+    // playlist must not yank its list to an unrelated row.
+    if (!isLoaded) return
     const row = rowRefs.current.get(index)
     if (!scroller || !row) return
     const box = scroller.getBoundingClientRect()
@@ -81,7 +91,7 @@ export default function Music() {
     const inset = 8
     if (line.top < box.top + inset) scroller.scrollTop -= box.top + inset - line.top
     else if (line.bottom > box.bottom - inset) scroller.scrollTop += line.bottom - box.bottom + inset
-  }, [index])
+  }, [index, isLoaded])
 
   return (
     <section className="container-page py-16 sm:py-20">
@@ -100,7 +110,7 @@ export default function Music() {
 
       {/* Playlist picker. Renders nothing until there is a second playlist to
           pick between, so a one-playlist library shows no chrome at all. */}
-      <PlaylistSwitcher className="mt-8" />
+      <PlaylistSwitcher className="mt-8" viewingId={shown?.id} />
 
       {/* An empty library is a valid state, not an error: the importer can
           write a manifest with no playlists, and there is no audio for the
@@ -159,11 +169,12 @@ export default function Music() {
 
           <div className="p-4 sm:p-6">
             <div className="flex items-center gap-4 sm:gap-6">
-              <TrackArt
-                art={track.art}
-                label={`Cover art for ${track.title}`}
-                className="w-20 h-20 sm:w-24 sm:h-24"
-              />
+  <TrackArt
+    art={track.art}
+    src={track.cover}
+    label={`Cover art for ${track.title}`}
+    className="w-20 h-20 sm:w-24 sm:h-24"
+  />
               <div className="min-w-0 flex-1">
                 <p className="font-mono text-[11px] uppercase tracking-widest text-amber">
                   now playing
@@ -343,7 +354,7 @@ export default function Music() {
             </p>
           ) : (
             <p className="mt-2 text-sm leading-relaxed text-ink-700 dark:text-paper-200/80 max-w-2xl">
-              <strong>{shown.title}</strong> by {shown.artist}, hosted here so
+              <strong>{shown.title}</strong> by me, hosted here so
               the player keeps real shuffle, loop, seek and volume controls. The
               audio is served for personal listening; it is not offered for
               redistribution, and the files stay the property of whoever made

@@ -1,10 +1,14 @@
-// TrackArt.jsx — generated cover art.
+// TrackArt.jsx — cover art for a track.
 //
-// The tracks are CC0 and had no artwork to ship, so each one gets a small
+// Most tracks are CC0 and had no artwork to ship, so each one gets a small
 // procedural SVG instead: a gradient built from the site's amber/teal accents
 // with a planet and orbit ring over it. The layout is derived from the track's
 // `art` index, so a given track always looks the same, and the whole set costs
 // nothing in the bundle and nothing in the repository.
+//
+// A playlist can override that with a real photograph by setting `cover` in
+// src/data/playlist.js. When `src` is given the photo is used and the generated
+// art is skipped, so one picture can stand in for a whole playlist.
 
 import { useId } from 'react'
 
@@ -31,11 +35,28 @@ const rand = (seed) => {
 /**
  * Cover art for one track.
  *
- * @param {number} art   Palette/layout index, normally `track.art`.
+ * @param {number} art     Palette/layout index, normally `track.art`.
+ * @param {string} src     Photograph to use instead of the generated art.
  * @param {string} className  Sizing classes, e.g. "w-10 h-10".
- * @param {string} label  Accessible name; omit to hide the image from a11y tree.
+ * @param {string} label   Accessible name; omit to hide the image from a11y tree.
  */
-export default function TrackArt({ art = 0, className = '', label }) {
+export default function TrackArt({ art = 0, src, className = '', label }) {
+  // A real photograph replaces the generated art entirely. object-cover keeps it
+  // filling whatever shape it is given, so a portrait photo sits correctly in the
+  // square dock without the file needing to be pre-cropped.
+  if (src) {
+    return (
+      <img
+        src={src}
+        alt={label || ''}
+        aria-hidden={label ? undefined : 'true'}
+        className={`block shrink-0 object-cover ${className}`}
+        loading="lazy"
+        decoding="async"
+      />
+    )
+  }
+
   // React's useId includes colons, which are not safe inside url(#...) refs.
   const uid = useId().replace(/[^a-zA-Z0-9]/g, '')
   const seed = art % PALETTES.length

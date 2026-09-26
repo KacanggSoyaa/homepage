@@ -4,17 +4,20 @@
 // screens, a hamburger icon that opens a collapsible dropdown menu.
 
 import { useState } from 'react'
-import { NavLink } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
 import { SunIcon, MoonIcon } from './Icons.jsx'
 
 // Navigation links for sections on the main page.
-// These use anchor hrefs (/#section) to smooth-scroll on the home page.
+// These are React Router links pointing at /#section rather than plain <a>
+// anchors. A plain anchor makes the browser reload the document, which tears
+// down the whole React tree and stops any playing music; a Link navigates
+// client-side and App.jsx's location effect does the smooth-scroll instead.
 const sectionLinks = [
-  { href: '/#home', label: 'home' },
-  { href: '/#projects', label: 'projects' },
-  // Will update later { href: '/#certificates', label: 'certificates' },
-  // Will update later { href: '/#achievements', label: 'achievements' },
-  { href: '/#contact', label: 'contact' },
+  { to: '/#home', label: 'home' },
+  { to: '/#projects', label: 'projects' },
+  // Will update later { to: '/#certificates', label: 'certificates' },
+  // Will update later { to: '/#achievements', label: 'achievements' },
+  { to: '/#contact', label: 'contact' },
 ]
 
 // Standalone pages that have their own route, rendered after the section links.
@@ -46,16 +49,16 @@ export default function Navbar({ theme, toggleTheme }) {
         {/* Desktop navigation: horizontal list of section links + About page link.
             Hidden on mobile (shown from sm breakpoint up). */}
         <ul className="hidden sm:flex items-center gap-1 font-mono text-sm">
-          {/* Section links — anchor hrefs that scroll to sections on the main page.
-              Each gets a subtle pill highlight on hover for a cleaner UI. */}
+          {/* Section links — client-side links that scroll to sections on the
+              main page. Each gets a subtle pill highlight on hover. */}
           {sectionLinks.map((link) => (
-            <li key={link.href}>
-              <a
-                href={link.href}
+            <li key={link.to}>
+              <Link
+                to={link.to}
                 className="prompt px-3.5 py-2 rounded-md transition-all text-ink-600 dark:text-paper-200/70 hover:text-ink-900 dark:hover:text-paper-50 hover:bg-ink-900/5 dark:hover:bg-paper-50/5"
               >
                 {link.label}
-              </a>
+              </Link>
             </li>
           ))}
           {/* Page links — route-based navigation with an active state */}
@@ -125,14 +128,14 @@ export default function Navbar({ theme, toggleTheme }) {
       >
         <ul className="flex flex-col px-4 pb-4 gap-1 font-mono text-sm">
           {sectionLinks.map((link) => (
-            <li key={link.href}>
-              <a
-                href={link.href}
+            <li key={link.to}>
+              <Link
+                to={link.to}
                 onClick={() => setMenuOpen(false)}
                 className="block prompt px-3 py-2.5 rounded-md transition-colors text-ink-600 dark:text-paper-200/70 hover:text-ink-900 dark:hover:text-paper-50 hover:bg-ink-900/5 dark:hover:bg-paper-50/5"
               >
                 {link.label}
-              </a>
+              </Link>
             </li>
           ))}
           {/* Page links — route-based navigation, also closes the dropdown */}

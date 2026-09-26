@@ -56,9 +56,10 @@ export default function PlayerDock() {
                   Hidden on phones: five transport buttons leave the title only
                   a few characters there, and the art still reads on /music. */}
               <div className="hidden sm:block shrink-0">
-                <TrackArt
-                  art={track.art}
-                  label={`Cover art for ${track.title}`}
+  <TrackArt
+    art={track.art}
+    src={track.cover}
+    label={`Cover art for ${track.title}`}
                   className={`w-10 h-10 ${loading && !isPlaying ? 'animate-pulse' : ''}`}
                 />
               </div>
