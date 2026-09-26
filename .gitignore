@@ -18,6 +18,12 @@ dist
 # Local files
 *.local
 
+# Source images that are only ever an input to a conversion step. The build uses
+# the generated .jpg, so committing the multi-megabyte .heic original would just
+# bloat the repository. Keep yours locally as the master.
+*.heic
+*.heif
+
 # Audio for the music page. The tracks are recordings you don't own the rights
 # to redistribute, so they stay out of the repository. The Pages workflow builds
 # from the repo, so it has no audio either — the site is pointed at a separately
