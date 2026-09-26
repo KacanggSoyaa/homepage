@@ -18,6 +18,23 @@ dist
 # Local files
 *.local
 
+# Audio for the music page. The tracks are recordings you don't own the rights
+# to redistribute, so they stay out of the repository. The Pages workflow builds
+# from the repo, so it has no audio either — the site is pointed at a separately
+# hosted copy of this tree via VITE_AUDIO_BASE, and this folder is the local
+# working copy of it. See "Where the audio lives" in README.md.
+#
+# The .txt notes in a playlist folder are deliberately not matched here, so they
+# stay tracked.
+public/audio/*/*.mp3
+public/audio/*/*.m4a
+public/audio/*/*.flac
+public/audio/*/*.wav
+public/audio/*/*.ogg
+public/audio/*/*.opus
+public/audio/*/*.aac
+public/audio/*/*.webm
+
 # Logs
 *.log
 npm-debug.log*

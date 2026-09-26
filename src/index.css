@@ -211,8 +211,207 @@
 }
 
 /* ============================================================
-   Feed scrollbar utility — slim, theme-aware scrollbar used on
-   the scrollable blog feed in the About page so it looks tidy
+   Player controls — the audio seek bar and the "now playing" bars.
+
+   These live in @layer components rather than @utility because they rely on
+   compound selectors (::-webkit-slider-thumb) and a set of CSS variables that
+   the Scrubber component writes inline per frame. Keeping them in the
+   components layer still lets any Tailwind utility override them.
+   ============================================================ */
+@layer components {
+  /* Shared appearance for the range inputs the player renders. Three sizes,
+     all driven by the same variables:
+       .scrubber       — the roomy seek bar on the /music page
+       .scrubber-slim  — the hairline progress line along the dock's top edge
+       .scrubber-mini  — the volume slider in the dock
+     The thumb on the dock line is invisible until hover, which keeps the
+     resting state to just a coloured progress rule. */
+  .scrubber,
+  .scrubber-slim,
+  .scrubber-mini {
+    /* Written inline by the Scrubber component as percentages. */
+    --played: 0%;
+    --buffered: 0%;
+    --rest: rgba(15, 17, 23, 0.16);
+    --fill: #E8A33D;
+    --fill-soft: rgba(232, 163, 61, 0.38);
+
+    --track-h: 4px;
+    --thumb: 12px;
+    --thumb-opacity: 1;
+    --hit-h: 18px;
+
+    -webkit-appearance: none;
+    appearance: none;
+    display: block;
+    width: 100%;
+    margin: 0;
+    background: transparent;
+    cursor: pointer;
+    /* Full-opacity hit area; the visible track is thinner than this. */
+    height: var(--hit-h);
+  }
+
+  .scrubber-slim,
+  .scrubber-mini {
+    --track-h: 3px;
+    --thumb: 10px;
+    --hit-h: 14px;
+  }
+
+  /* The dock progress line hides its thumb until the pointer is over it. */
+  .scrubber-slim {
+    --thumb-opacity: 0;
+  }
+
+  .scrubber-slim:hover,
+  .scrubber-slim:focus-visible {
+    --thumb-opacity: 1;
+  }
+
+  /* The rest of the bar reads lighter against the dark dock. */
+  .dark .scrubber,
+  .dark .scrubber-slim,
+  .dark .scrubber-mini {
+    --rest: rgba(228, 231, 236, 0.18);
+  }
+
+  .scrubber:disabled,
+  .scrubber-slim:disabled,
+  .scrubber-mini:disabled {
+    cursor: default;
+    opacity: 0.45;
+  }
+
+  /* Chromium/WebKit. A three-stop gradient paints played, buffered, and
+     unplayed in one background, which avoids a wrapper element per bar. */
+  .scrubber::-webkit-slider-runnable-track,
+  .scrubber-slim::-webkit-slider-runnable-track,
+  .scrubber-mini::-webkit-slider-runnable-track {
+    height: var(--track-h);
+    border-radius: 9999px;
+    background: linear-gradient(
+      to right,
+      var(--fill) 0 var(--played),
+      var(--fill-soft) var(--played) var(--buffered),
+      var(--rest) var(--buffered) 100%
+    );
+  }
+
+  .scrubber::-webkit-slider-thumb,
+  .scrubber-slim::-webkit-slider-thumb,
+  .scrubber-mini::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: var(--thumb);
+    height: var(--thumb);
+    /* Centres the thumb on the track regardless of the two sizes. */
+    margin-top: calc((var(--track-h) - var(--thumb)) / 2);
+    border: none;
+    border-radius: 9999px;
+    background: var(--fill);
+    box-shadow: 0 0 0 3px rgba(232, 163, 61, 0.16);
+    opacity: var(--thumb-opacity);
+    transition: transform 0.15s ease, opacity 0.15s ease;
+  }
+
+  .scrubber:hover::-webkit-slider-thumb,
+  .scrubber-slim:hover::-webkit-slider-thumb,
+  .scrubber-mini:hover::-webkit-slider-thumb {
+    transform: scale(1.18);
+  }
+
+  .scrubber:active::-webkit-slider-thumb,
+  .scrubber-slim:active::-webkit-slider-thumb,
+  .scrubber-mini:active::-webkit-slider-thumb {
+    transform: scale(1.32);
+  }
+
+  .scrubber:focus-visible::-webkit-slider-thumb,
+  .scrubber-slim:focus-visible::-webkit-slider-thumb,
+  .scrubber-mini:focus-visible::-webkit-slider-thumb {
+    box-shadow: 0 0 0 4px rgba(232, 163, 61, 0.32);
+  }
+
+  /* Firefox exposes ::-moz-range-progress, so it needs no gradient. */
+  .scrubber::-moz-range-track,
+  .scrubber-slim::-moz-range-track,
+  .scrubber-mini::-moz-range-track {
+    height: var(--track-h);
+    border-radius: 9999px;
+    background: var(--rest);
+  }
+
+  .scrubber::-moz-range-progress,
+  .scrubber-slim::-moz-range-progress,
+  .scrubber-mini::-moz-range-progress {
+    height: var(--track-h);
+    border-radius: 9999px;
+    background: var(--fill);
+  }
+
+  .scrubber::-moz-range-thumb,
+  .scrubber-slim::-moz-range-thumb,
+  .scrubber-mini::-moz-range-thumb {
+    width: var(--thumb);
+    height: var(--thumb);
+    border: none;
+    border-radius: 9999px;
+    background: var(--fill);
+    opacity: var(--thumb-opacity);
+  }
+
+  /* Three-bar equaliser shown next to the row that is currently playing. */
+  .playing-eq {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 13px;
+  }
+
+  .playing-eq span {
+    width: 2px;
+    height: 100%;
+    border-radius: 1px;
+    background: currentColor;
+    transform-origin: bottom;
+    animation: eq-bounce 0.9s ease-in-out infinite;
+  }
+
+  .playing-eq span:nth-child(2) {
+    animation-delay: 0.18s;
+  }
+
+  .playing-eq span:nth-child(3) {
+    animation-delay: 0.36s;
+  }
+
+  /* Paused rows hold still instead of freezing mid-bounce. */
+  .playing-eq[data-paused="true"] span {
+    animation-play-state: paused;
+  }
+
+  @keyframes eq-bounce {
+    0%,
+    100% {
+      transform: scaleY(0.3);
+    }
+    50% {
+      transform: scaleY(1);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .playing-eq span {
+      animation: none;
+      transform: scaleY(0.6);
+    }
+  }
+}
+
+/* ============================================================
+   Feed scrollbar utility — slim, theme-aware scrollbar used on the
+   scrollable blog feed in the About page so it looks tidy
    instead of a chunky default browser scrollbar.
    ============================================================ */
 @utility feed-scroll {

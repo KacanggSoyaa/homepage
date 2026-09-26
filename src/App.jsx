@@ -7,7 +7,10 @@ import { Routes, Route, useLocation } from 'react-router-dom'
 import Navbar from './components/Navbar.jsx'
 import Footer from './components/Footer.jsx'
 import SpaceBackground from './components/SpaceBackground.jsx'
+import PlayerDock from './components/PlayerDock.jsx'
+import { PlayerProvider } from './player/PlayerContext.jsx'
 import About from './pages/About.jsx'
+import Music from './pages/Music.jsx'
 import Thread from './pages/Thread.jsx'
 
 // App is the root component. It receives the `sections` array from main.jsx
@@ -53,48 +56,63 @@ export default function App({ sections }) {
   const toggleTheme = () => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))
 
   return (
-    // Outer wrapper: min-h-screen + flex column keeps the footer pinned to
-    // the bottom even on short pages, with main filling the middle.
-    // `relative` makes the absolutely-anchored space background scope cleanly.
-    <div className="min-h-screen flex flex-col relative overflow-x-clip">
-      {/* Global space-themed background (stars, moon, sun, solar system).
-          Rendered behind everything and follows the current theme. */}
-      <SpaceBackground theme={theme} />
+    // PlayerProvider owns the single audio element for the whole app. It wraps
+    // everything so a track survives navigation between routes.
+    <PlayerProvider>
+      {/* Outer wrapper: min-h-screen + flex column keeps the footer pinned to
+          the bottom even on short pages, with main filling the middle.
+          `relative` makes the absolutely-anchored space background scope cleanly. */}
+      <div className="min-h-screen flex flex-col relative overflow-x-clip">
+        {/* Global space-themed background (stars, moon, sun, solar system).
+            Rendered behind everything and follows the current theme. */}
+        <SpaceBackground theme={theme} />
 
-      {/* Sticky navigation bar shown at the top of every page */}
-      <Navbar theme={theme} toggleTheme={toggleTheme} />
+        {/* Sticky navigation bar shown at the top of every page */}
+        <Navbar theme={theme} toggleTheme={toggleTheme} />
 
-      {/* Main content area — flex-1 makes it expand to push the footer down.
-          relative + z-10 keeps content above the fixed background. */}
-      <main className="flex-1 relative z-10">
-        <Routes>
-          {/* Home route: renders all sections from the `sections` array
-              stacked vertically, with a horizontal divider between them. */}
-          <Route
-            path="/"
-            element={
-              <>
-                {sections.map(({ id, Component }, i) => (
-                  <div key={id}>
-                    <Component />
-                    {/* Add a divider between sections, but not after the last one */}
-                    {i < sections.length - 1 && (
-                      <hr className="border-ink-200/15 dark:border-paper-50/10 mx-6 sm:mx-10" />
-                    )}
-                  </div>
-                ))}
-              </>
-            }
-          />
-          {/* About page lives on its own route, separate from the main scroll */}
-          <Route path="/about" element={<About />} />
-          {/* Full detail page for a single blog thread (/blog/:id) */}
-          <Route path="/blog/:id" element={<Thread />} />
-        </Routes>
-      </main>
+        {/* Main content area — flex-1 makes it expand to push the footer down.
+            relative + z-10 keeps content above the fixed background. */}
+        <main className="flex-1 relative z-10">
+          <Routes>
+            {/* Home route: renders all sections from the `sections` array
+                stacked vertically, with a horizontal divider between them. */}
+            <Route
+              path="/"
+              element={
+                <>
+                  {sections.map(({ id, Component }, i) => (
+                    <div key={id}>
+                      <Component />
+                      {/* Add a divider between sections, but not after the last one */}
+                      {i < sections.length - 1 && (
+                        <hr className="border-ink-200/15 dark:border-paper-50/10 mx-6 sm:mx-10" />
+                      )}
+                    </div>
+                  ))}
+                </>
+              }
+            />
+            {/* About page lives on its own route, separate from the main scroll */}
+            <Route path="/about" element={<About />} />
+            {/* Music page: the self-hosted player + tracklist on its own route.
+                The optional :id picks the playlist — /music opens the one that
+                was loaded last, /music/mood opens Mood. Both render the same
+                page, which reads the id and asks the player to switch. */}
+            <Route path="/music" element={<Music />} />
+            <Route path="/music/:id" element={<Music />} />
+            {/* Full detail page for a single blog thread (/blog/:id) */}
+            <Route path="/blog/:id" element={<Thread />} />
+          </Routes>
+        </main>
 
-      {/* Site-wide footer with social links */}
-      <Footer />
-    </div>
+        {/* Site-wide footer with social links */}
+        <Footer />
+
+        {/* Persistent bottom transport bar. Mounted once here (not inside the
+            Routes) so it is present on every page, and it renders its own
+            in-flow spacer so the fixed bar never covers the footer. */}
+        <PlayerDock />
+      </div>
+    </PlayerProvider>
   )
 }

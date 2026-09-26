@@ -82,3 +82,162 @@ export const StarIcon = ({ filled = false, ...props }) => (
     <path d="m12 2.5 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3-5.8 3 1.1-6.5-4.7-4.6 6.5-.9 2.9-5.9Z" />
   </svg>
 )
+
+// ---- Player transport icons ----
+// The play/pause pair is solid-filled so it reads as the primary control at
+// dock size; the surrounding transport icons stay stroked and inherit colour
+// from the button they sit in.
+
+// Play triangle — solid, default 18x18
+export const PlayIcon = (props) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" {...props}>
+    <path d="M7.5 4.6a1 1 0 0 1 1.52-.85l9 6.4a1 1 0 0 1 0 1.7l-9 6.4A1 1 0 0 1 7.5 17.4Z" />
+  </svg>
+)
+
+// Pause bars — solid, default 18x18
+export const PauseIcon = (props) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" {...props}>
+    <rect x="6" y="4.5" width="4" height="15" rx="1.2" />
+    <rect x="14" y="4.5" width="4" height="15" rx="1.2" />
+  </svg>
+)
+
+// Previous track — outlined triangle with a bar on the left, default 18x18
+export const PrevIcon = (props) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    stroke="currentColor"
+    strokeWidth="1.8"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    width="18"
+    height="18"
+    {...props}
+  >
+    <path d="M18.5 5.4a1 1 0 0 1 1.53.85v11.5a1 1 0 0 1-1.53.85l-8-5.75a1 1 0 0 1 0-1.7Z" />
+    <path d="M6 5v14" fill="none" />
+  </svg>
+)
+
+// Next track — outlined triangle with a bar on the right, default 18x18
+export const NextIcon = (props) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    stroke="currentColor"
+    strokeWidth="1.8"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    width="18"
+    height="18"
+    {...props}
+  >
+    <path d="M5.5 5.4a1 1 0 0 0-1.53.85v11.5a1 1 0 0 0 1.53.85l8-5.75a1 1 0 0 0 0-1.7Z" />
+    <path d="M18 5v14" fill="none" />
+  </svg>
+)
+
+// Shuffle — two crossing arrows, default 18x18
+export const ShuffleIcon = (props) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.8"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    width="18"
+    height="18"
+    {...props}
+  >
+    <path d="M16.5 3.5 20 7l-3.5 3.5" />
+    <path d="M16.5 13.5 20 17l-3.5 3.5" />
+    <path d="M20 7h-3.6a4 4 0 0 0-3.1 1.5l-4.6 6a4 4 0 0 1-3.1 1.5H4" />
+    <path d="M20 17h-3.6a4 4 0 0 1-3.1-1.5l-.8-1" />
+    <path d="M4 7h1.6a4 4 0 0 1 3.1 1.5l.8 1" />
+  </svg>
+)
+
+// Repeat — looping arrows around the track; `once` swaps in a "1" to mark
+// repeat-one, default 18x18
+export const RepeatIcon = ({ once = false, ...props }) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.8"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    width="18"
+    height="18"
+    {...props}
+  >
+    <path d="m17 2.5 3.5 3.5L17 9.5" />
+    <path d="M3.5 12.5V11a4 4 0 0 1 4-4h13" />
+    <path d="m7 21.5-3.5-3.5L7 14.5" />
+    <path d="M20.5 11.5V13a4 4 0 0 1-4 4h-13" />
+    {once && <path d="M11.2 9.6h1.1v4.4" strokeWidth="1.9" />}
+  </svg>
+)
+
+// Volume — speaker with two waves, default 18x18
+export const VolumeIcon = (props) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.8"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    width="18"
+    height="18"
+    {...props}
+  >
+    <path d="M11 4.7a.7.7 0 0 0-1.2-.5L6.4 7.6A1.4 1.4 0 0 1 5.4 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.4a1.4 1.4 0 0 1 1 .4l3.4 3.4a.7.7 0 0 0 1.2-.5Z" />
+    <path d="M15.5 9.2a4 4 0 0 1 0 5.6" />
+    <path d="M18.4 6.3a8 8 0 0 1 0 11.4" />
+  </svg>
+)
+
+// Volume muted — speaker with a slash, default 18x18
+export const VolumeMuteIcon = (props) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.8"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    width="18"
+    height="18"
+    {...props}
+  >
+    <path d="M11 4.7a.7.7 0 0 0-1.2-.5L6.4 7.6A1.4 1.4 0 0 1 5.4 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.4a1.4 1.4 0 0 1 1 .4l3.4 3.4a.7.7 0 0 0 1.2-.5Z" />
+    <path d="m16 9.5 5 5" />
+    <path d="m21 9.5-5 5" />
+  </svg>
+)
+
+// Queue / list icon — links the dock to the full tracklist, default 18x18
+export const QueueIcon = (props) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.8"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    width="18"
+    height="18"
+    {...props}
+  >
+    <path d="M4 6h11" />
+    <path d="M4 12h11" />
+    <path d="M4 18h7" />
+    <path d="M17.5 10.5v7.2" />
+    <circle cx="15.8" cy="18.2" r="1.7" />
+  </svg>
+)
+

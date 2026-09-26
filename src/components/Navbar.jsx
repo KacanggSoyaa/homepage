@@ -17,6 +17,14 @@ const sectionLinks = [
   { href: '/#contact', label: 'contact' },
 ]
 
+// Standalone pages that have their own route, rendered after the section links.
+// These use React Router NavLink so they get real client-side navigation and an
+// active state while you are on the page.
+const pageLinks = [
+  { to: '/music', label: 'music' },
+  { to: '/about', label: 'about' },
+]
+
 export default function Navbar({ theme, toggleTheme }) {
   // Tracks whether the mobile dropdown menu is open.
   const [menuOpen, setMenuOpen] = useState(false)
@@ -50,21 +58,23 @@ export default function Navbar({ theme, toggleTheme }) {
               </a>
             </li>
           ))}
-          {/* About link — uses React Router NavLink for route-based navigation and active state */}
-          <li>
-            <NavLink
-              to="/about"
-              className={({ isActive }) =>
-                `prompt px-3.5 py-2 rounded-md transition-all ${
-                  isActive
-                    ? 'text-amber dark:text-glow-amber bg-ink-900/5 dark:bg-paper-50/5'
-                    : 'text-ink-600 dark:text-paper-200/70 hover:text-ink-900 dark:hover:text-paper-50 hover:bg-ink-900/5 dark:hover:bg-paper-50/5'
-                }`
-              }
-            >
-              about
-            </NavLink>
-          </li>
+          {/* Page links — route-based navigation with an active state */}
+          {pageLinks.map((link) => (
+            <li key={link.to}>
+              <NavLink
+                to={link.to}
+                className={({ isActive }) =>
+                  `prompt px-3.5 py-2 rounded-md transition-all ${
+                    isActive
+                      ? 'text-amber dark:text-glow-amber bg-ink-900/5 dark:bg-paper-50/5'
+                      : 'text-ink-600 dark:text-paper-200/70 hover:text-ink-900 dark:hover:text-paper-50 hover:bg-ink-900/5 dark:hover:bg-paper-50/5'
+                  }`
+                }
+              >
+                {link.label}
+              </NavLink>
+            </li>
+          ))}
         </ul>
 
         {/* Right-side controls: theme toggle (always visible) + hamburger (mobile only) */}
@@ -125,21 +135,24 @@ export default function Navbar({ theme, toggleTheme }) {
               </a>
             </li>
           ))}
-          <li>
-            <NavLink
-              to="/about"
-              onClick={() => setMenuOpen(false)}
-              className={({ isActive }) =>
-                `block prompt px-3 py-2.5 rounded-md transition-colors ${
-                  isActive
-                    ? 'text-amber dark:text-glow-amber bg-ink-900/5 dark:bg-paper-50/5'
-                    : 'text-ink-600 dark:text-paper-200/70 hover:text-ink-900 dark:hover:text-paper-50 hover:bg-ink-900/5 dark:hover:bg-paper-50/5'
-                }`
-              }
-            >
-              about
-            </NavLink>
-          </li>
+          {/* Page links — route-based navigation, also closes the dropdown */}
+          {pageLinks.map((link) => (
+            <li key={link.to}>
+              <NavLink
+                to={link.to}
+                onClick={() => setMenuOpen(false)}
+                className={({ isActive }) =>
+                  `block prompt px-3 py-2.5 rounded-md transition-colors ${
+                    isActive
+                      ? 'text-amber dark:text-glow-amber bg-ink-900/5 dark:bg-paper-50/5'
+                      : 'text-ink-600 dark:text-paper-200/70 hover:text-ink-900 dark:hover:text-paper-50 hover:bg-ink-900/5 dark:hover:bg-paper-50/5'
+                  }`
+                }
+              >
+                {link.label}
+              </NavLink>
+            </li>
+          ))}
         </ul>
       </div>
     </header>

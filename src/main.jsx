@@ -21,6 +21,8 @@ import Contact from './pages/Contact.jsx'
 
 // Registry of sections rendered on the home page.
 // Order here determines the order they appear when scrolling down the page.
+// Note: Music is not listed here — it has its own route (see App.jsx), so it
+// is reached via the navbar rather than by scrolling.
 const sections = [
   { id: 'home', Component: Home },
   { id: 'projects', Component: Projects },
