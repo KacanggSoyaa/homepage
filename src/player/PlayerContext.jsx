@@ -61,6 +61,10 @@ function loadPrefs() {
 // always pinned to the front, so switching shuffle on mid-song never interrupts
 // what is already playing — it only changes what plays next.
 function buildOrder(count, currentIndex, shuffled) {
+  // An empty library has no order at all. Without this the function would hand
+  // back [0] — a track index that does not exist — and `step` would treat the
+  // playlist as non-empty and try to load it.
+  if (count <= 0) return []
   const rest = []
   for (let i = 0; i < count; i += 1) if (i !== currentIndex) rest.push(i)
   if (shuffled) {

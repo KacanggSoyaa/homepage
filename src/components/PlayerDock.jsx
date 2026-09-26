@@ -26,8 +26,15 @@ const BORDER_H = 1
 const DOCK_H = BAR_H + PROGRESS_H + BORDER_H
 
 export default function PlayerDock() {
-  const { playlist, track, isPlaying, loading, error, currentTime, duration, repeat, shuffle } =
+  const { playlist, tracks, track, isPlaying, loading, error, currentTime, duration, repeat, shuffle } =
     usePlayer()
+
+  // With no tracks there is nothing to show and nothing to control, so the bar
+  // and the spacer that reserves its height are both dropped. Rendering it
+  // anyway would mean a row of dead buttons and a track with no title, since
+  // `track` is undefined for an empty library. Safe to return early: the only
+  // hook above is the context read.
+  if (!tracks.length) return null
 
   return (
     <>

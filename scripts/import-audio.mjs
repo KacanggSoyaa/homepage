@@ -11,6 +11,7 @@
 //   node scripts/import-audio.mjs ~/Music/new-track.mp3 --no-encode   # already encoded
 //   node scripts/import-audio.mjs ~/Music/my-playlist --limit 150      # 2:30 excerpts
 //   node scripts/import-audio.mjs ~/Music/my-playlist --clean          # drop orphans
+//   node scripts/import-audio.mjs public/audio --allow-empty           # clear the library
 //
 // Everything except the generated manifest is hand-maintained: page copy lives
 // in src/data/playlist.js and is never touched here.
@@ -68,6 +69,7 @@ if (!source) {
     --normalize            even out loudness across tracks (single-pass)
     --no-encode            files are already encoded; just build the manifest
     --clean                delete public/audio files the manifest no longer uses
+    --allow-empty          permit a source folder with no audio (writes an empty library)
     --dry-run              report everything, write nothing
 `)
   process.exit(0)
@@ -150,11 +152,20 @@ const files = statSync(inputPath).isDirectory()
   : [inputPath]
 
 if (files.length === 0) {
-  fail(
-    `No audio files in ${inputPath}\n` +
-      `  Looked for: ${[...EXTENSIONS].join(', ')}`,
-  )
+  // An empty library is a legitimate end state — the music page is designed to
+  // render without a tracklist — but it is far more often a mistyped path. So
+  // it has to be asked for, which keeps a wrong --source from silently wiping
+  // the manifest.
+  if (!flags['allow-empty']) {
+    fail(
+      `No audio files in ${inputPath}\n` +
+        `  Looked for: ${[...EXTENSIONS].join(', ')}\n` +
+        `  To clear the library on purpose, add --allow-empty.`,
+    )
+  }
+  console.log(`  no audio files in ${inputPath} — writing an empty library (--allow-empty)`)
 }
+
 
 // An --order file pins the running order, which is how a curated sequence
 // survives a re-import. Anything not listed keeps its alphabetical position

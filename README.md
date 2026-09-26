@@ -31,6 +31,7 @@ to Vercel, Netlify, GitHub Pages, or any static host.
 | Blog / threads | `src/data/blog.js` (+ photos in `src/components/img/blog/`) |
 | Bio / education | `src/pages/About.jsx` |
 | Hero text | `src/pages/Home.jsx` |
+| Music / tracks | `public/audio/` + `scripts/import-audio.mjs` (generates `src/data/audio-manifest.js`) |
 | Contact links (email, GitHub, LinkedIn) | `src/components/Footer.jsx`, `src/pages/Contact.jsx` |
 
 Every placeholder is marked with a `// TODO:` comment.
@@ -93,6 +94,122 @@ Other options:
 - Run `npm run heic:jpg -- <folder>` to convert a different folder.
 
 See `src/components/img/blog/README.md` for the full documentation.
+
+## Music: adding your own songs
+
+The `/music` page is a real player — shuffle, loop, seek, volume, and a persistent
+dock — and it plays whatever audio sits in `public/audio`. Only one thing controls
+what shows up in the tracklist: the generated manifest.
+
+**1. Drop your files into `public/audio`**
+
+```
+public/audio/Artist - Title.mp3
+```
+
+Naming them `Artist - Title` matters: the importer splits on the first dash and
+fills in both fields, so `Mahalini - Sial.mp3` becomes artist *Mahalini*, title
+*Sial*. Without the dash the whole filename becomes the title.
+
+MP3, M4A, AAC, WAV, FLAC, OGG, OPUS and WEBM are all read.
+
+**2. Empty the folder if you don't want the old set**
+
+The importer reads the **whole** folder, so the CC0 tracks that ship with the site
+are still in there and would get merged in. To start fresh, move them out first:
+
+```bash
+mv public/audio/* ~/somewhere-else/          # macOS / Linux
+Move-Item "public\audio\*" "C:\somewhere-else\"   # Windows PowerShell
+```
+
+**3. Run the importer**
+
+```bash
+node scripts/import-audio.mjs "public/audio" --title "My Playlist"
+```
+
+That re-encodes everything in the folder and rewrites `src/data/audio-manifest.js`.
+
+### Options
+
+| Flag | What it does |
+|---|---|
+| `--title <text>` | Playlist title shown in the player |
+| `--artist <text>` | Credit one artist for every track |
+| `--description <text>` | One-line blurb under the title |
+| `--quality <name>` | `small` (mono 64k) · `medium` (stereo 128k, default) · `high` (stereo 256k) |
+| `--limit <seconds>` | Trim each track to an excerpt, with a 1.5s fade |
+| `--order <file>` | Pin the running order from a newline-separated list |
+| `--normalize` | Even out loudness across tracks (single pass) |
+| `--no-encode` | Files are already encoded — just rebuild the manifest |
+| `--clean` | Delete `public/audio` files the new manifest doesn't reference |
+| `--allow-empty` | Permit a folder with no audio — writes an empty library |
+| `--dry-run` | Report everything, write nothing |
+
+Run with `--dry-run` first when you're unsure how it'll read your filenames — it
+prints every title, artist, and output size without touching a file.
+
+### Keeping the deploy small
+
+Full-length tracks are big. A 14-song set of 5 MB encodes is ~76 MB shipped on
+every deploy, which is most of your site. Two flags fix that:
+
+```bash
+node scripts/import-audio.mjs "public/audio" --title "My Playlist" --limit 210 --quality small
+```
+
+That trims to 3:30 excerpts at mono 64 kbps — roughly 8 MB for the same 14 songs.
+`--quality small` is mono, so it's fine for ambient/drone material but thin for
+anything with bass in it; use `--quality medium` as the safer default.
+
+### Custom running order
+
+`--order` takes a plain text file, one filename per line. Anything not listed
+keeps its alphabetical position after the listed tracks rather than being dropped.
+
+```bash
+node scripts/import-audio.mjs "public/audio" --order my-order.txt
+```
+
+`#` starts a comment, and blank lines are ignored — see `scripts/cc0-order.txt`
+for a worked example.
+
+### Starting from empty
+
+An empty library is a supported state. `/music` renders a short "nothing queued"
+panel instead of a player, and the dock is not mounted at all, so an empty
+library costs the page no dead controls.
+
+```bash
+node scripts/import-audio.mjs public/audio --allow-empty --no-encode --title "Music"
+```
+
+`--allow-empty` is required on purpose — without it the importer stops on a
+folder with no audio, so a mistyped path can't silently wipe your tracklist.
+Add `--clean` to also delete whatever is sitting in `public/audio`.
+
+### Restoring the CC0 set
+
+The set that ships with the site is *free archive of ambient music* by josh korda,
+under CC0 1.0, trimmed to 2:30 mono 64 kbps. `scripts/cc0-order.txt` holds the
+curated running order and documents the exact command to rebuild it.
+
+### Notes
+
+- `src/data/audio-manifest.js` is **generated** — don't hand-edit it, or your next
+  import will overwrite your changes. Page copy lives in `src/data/playlist.js`.
+- Importing needs **ffmpeg**, which ships with the project as the `ffmpeg-static`
+  dev dependency — so a fresh `npm install` is all you need. The importer looks
+  for it in this order: the `FFMPEG_PATH` environment variable, `ffmpeg` on your
+  `PATH`, `node_modules/ffmpeg-static/`, then a legacy copy under `%TEMP%`. If it
+  can't find one it prints the fix and stops without writing anything.
+- `--clean` **deletes** anything in `public/audio` the new manifest doesn't
+  reference. It's safe on a normal import, but don't reach for it expecting a
+  dry run to protect anything.
+- Importing is slow — re-encoding 14 full tracks takes a few minutes. Use
+  `--no-encode` to skip straight to the manifest when the files are already the
+  encodes you want.
 
 ## Notes
 

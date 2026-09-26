@@ -64,6 +64,27 @@ export default function Music() {
         </p>
       </ScrollReveal>
 
+      {/* An empty library is a valid state, not an error: the importer can
+          write a manifest with no tracks, and there is no audio for the panel,
+          the tracklist or the licence note to describe. Rather than render a
+          player with an undefined track, the page says what is going on and how
+          to fill it. */}
+      {tracks.length === 0 ? (
+        <ScrollReveal delay={80}>
+          <div className="mt-10 glass rounded-lg border border-ink-200/15 dark:border-paper-50/10 px-6 py-10 sm:px-10 sm:py-14">
+            <h2 className="font-mono text-lg font-semibold">nothing queued</h2>
+            <p className="mt-2 text-sm leading-relaxed text-ink-700 dark:text-paper-200/80 max-w-xl">
+              The library is empty, so there is no player to show. Audio added
+              later appears here automatically, with the full set of controls.
+            </p>
+            <p className="mt-4 font-mono text-xs text-ink-600 dark:text-paper-200/50">
+              to add tracks: drop audio into <span className="text-amber">public/audio</span> and
+              run <span className="text-amber">node scripts/import-audio.mjs public/audio</span>
+            </p>
+          </div>
+        </ScrollReveal>
+      ) : (
+        <>
       {/* Player panel, in the site's glass card so it matches the project and
           certificate cards. This is a view onto the shared engine, not a
           second player — the dock shows the same state. */}
@@ -271,6 +292,8 @@ export default function Music() {
           )}
         </div>
       </ScrollReveal>
+        </>
+      )}
     </section>
   )
 }
