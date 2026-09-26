@@ -240,3 +240,4 @@ export const QueueIcon = (props) => (
     <circle cx="15.8" cy="18.2" r="1.7" />
   </svg>
 )
+

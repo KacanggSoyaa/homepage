@@ -1,10 +1,8 @@
 // Music.jsx — the "now playing" page on the /music route.
 //
-// The player used to be a Spotify embed, which meant no transport control from
-// the page and a 30-second preview for anyone not signed in to Premium. The
-// audio is now CC0 and served from /audio, so this page is a real player: the
-// panel below drives the same engine as the persistent dock, and every row of
-// the tracklist is a play button rather than a link out to a streaming service.
+// The audio is served from /audio, so this page is a real player: the panel
+// below drives the same engine as the persistent dock, and every row of the
+// tracklist is a play button.
 
 import { useEffect, useRef } from 'react'
 import { usePlayer, formatTime } from '../player/PlayerContext.jsx'
@@ -138,16 +136,20 @@ export default function Music() {
             </p>
           </div>
 
-          {/* Credit for the source, rather than a link out to a streaming copy. */}
-          <a
-            href={playlist.source}
-            target="_blank"
-            rel="noreferrer noopener"
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md bg-amber text-ink-950 font-mono text-xs font-medium hover:bg-amber-light hover:shadow-lg hover:shadow-amber/25 transition-all"
-          >
-            source
-            <ExternalLinkIcon width="13" height="13" />
-          </a>
+          {/* Credit for where the audio came from. Audio the site owner
+              supplied has no upstream source, so the button is simply absent
+              rather than rendered as a link with no href. */}
+          {playlist.source && (
+            <a
+              href={playlist.source}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md bg-amber text-ink-950 font-mono text-xs font-medium hover:bg-amber-light hover:shadow-lg hover:shadow-amber/25 transition-all"
+            >
+              source
+              <ExternalLinkIcon width="13" height="13" />
+            </a>
+          )}
         </div>
 
         {/* The list lives in a card with its own scrollbar, capped so about a
@@ -232,26 +234,41 @@ export default function Music() {
         </div>
       </ScrollReveal>
 
-      {/* Why there is no streaming embed any more, and what the licence allows. */}
+      {/* Where the audio comes from and what may be done with it. The wording
+          follows the manifest: a licence is only claimed when the importer was
+          given one, so audio the site owner owns never gets described with a
+          public-domain grant that does not apply to it. */}
       <ScrollReveal delay={160}>
         <div className="mt-14 border-l-2 border-amber/40 pl-4">
           <h2 className="font-mono text-sm font-semibold text-amber">source &amp; licence</h2>
-          <p className="mt-2 text-sm leading-relaxed text-ink-700 dark:text-paper-200/80 max-w-2xl">
-            Every track here is <strong>{playlist.title}</strong> by {playlist.artist},
-            released under{' '}
-            <a
-              href={playlist.licenseUrl}
-              target="_blank"
-              rel="noreferrer noopener"
-              className="text-amber hover:text-amber-light underline underline-offset-2"
-            >
-              {playlist.license}
-            </a>{' '}
-            — public domain, so the files are served straight from this site with
-            no account, no subscription, and no preview cut-offs. They are trimmed
-            to a 2:30 excerpt and re-encoded small so the whole playlist costs
-            about 14&nbsp;MB of bandwidth.
-          </p>
+          {playlist.license ? (
+            <p className="mt-2 text-sm leading-relaxed text-ink-700 dark:text-paper-200/80 max-w-2xl">
+              Every track here is <strong>{playlist.title}</strong> by {playlist.artist},
+              released under{' '}
+              {playlist.licenseUrl ? (
+                <a
+                  href={playlist.licenseUrl}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="text-amber hover:text-amber-light underline underline-offset-2"
+                >
+                  {playlist.license}
+                </a>
+              ) : (
+                <span>{playlist.license}</span>
+              )}
+              , so the files are served straight from this site with no account,
+              no subscription, and no preview cut-offs.
+            </p>
+          ) : (
+            <p className="mt-2 text-sm leading-relaxed text-ink-700 dark:text-paper-200/80 max-w-2xl">
+              <strong>{playlist.title}</strong> by {playlist.artist}, hosted here so
+              the player keeps real shuffle, loop, seek and volume controls. The
+              audio is served for personal listening; it is not offered for
+              redistribution, and the files stay the property of whoever made
+              them.
+            </p>
+          )}
         </div>
       </ScrollReveal>
     </section>

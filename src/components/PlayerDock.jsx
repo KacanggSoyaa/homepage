@@ -93,6 +93,7 @@ export default function PlayerDock() {
                 <QueueIcon width={15} height={15} />
                 queue
               </Link>
+
             </div>
           </div>
         </div>

@@ -1,0 +1,22 @@
+# Running order for the CC0 set that shipped with the site.
+# One filename per line; blank lines and # comments ignored.
+#
+# Regenerate the manifest for this set with:
+#   node scripts/import-audio.mjs public/audio --no-encode \
+#     --order scripts/cc0-order.txt \
+#     --title "Free Archive of Ambient Music" --artist "josh korda" \
+#     --license "CC0 1.0 Universal" \
+#     --license-url "https://creativecommons.org/publicdomain/zero/1.0/" \
+#     --source "https://archive.org/details/FreeArchiveOfAmbientMusic"
+Stasis.mp3
+Ominous Tidings.mp3
+Spacey Psychedelic Ambience.mp3
+Hardly Ever Awake.mp3
+Dim Light Peaking Over the Horizon.mp3
+The Monk Makes Slow Passage.mp3
+Chromatic Shifts Over Sliding Tones.mp3
+Overlapping Events in Time.mp3
+Low Visibility Advisory.mp3
+Slow Ambient Arise and Pass.mp3
+Slowing to a Final Descent.mp3
+The Romance of Returning Signals.mp3
