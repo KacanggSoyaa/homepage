@@ -17,6 +17,7 @@
 // as words, so "late-night" shows as "Late Night" and a brand-new playlist
 // appears in the switcher the moment it is imported.
 
+import { audioUrl } from './audio.js'
 import { library } from './audio-manifest.js'
 
 const UNKNOWN = 'Unknown artist'
@@ -61,7 +62,17 @@ export const playlists = library.playlists.map((generated) => {
     // Track artists come from the playlist, since the importer reads filenames
     // and not ID3 tags. Spreading `artist` onto each track keeps every consumer
     // — the tracklist rows, the dock, the media session — reading one field.
-    tracks: generated.tracks.map((track) => ({ ...track, artist: track.artist || artist })),
+    //
+    // 'file' is the path inside the audio root; 'src' is the URL the player
+    // actually loads, which is the same path until audio.js is told the audio
+    // lives on another host. Resolving it here, rather than in the generated
+    // manifest, is what lets a re-import never disturb where the site looks for
+    // its music.
+    tracks: generated.tracks.map((track) => ({
+      ...track,
+      src: audioUrl(track.file),
+      artist: track.artist || artist,
+    })),
   }
 })
 

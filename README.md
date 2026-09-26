@@ -19,7 +19,11 @@ npm run preview
 ```
 
 The production build is output to the `dist/` folder — you can deploy that folder
-to Vercel, Netlify, GitHub Pages, or any static host.
+to Vercel, Netlify, GitHub Pages, or any static host. Note that `dist/` only
+contains the music if the audio is in `public/audio` at build time; the audio
+tracks are git-ignored, so a build made from the repository (which is what the
+GitHub Pages workflow does) needs the audio hosted separately — see
+[Where the audio lives](#where-the-audio-lives).
 
 ## Where to edit your content
 
@@ -176,7 +180,9 @@ Other things that look like "it doesn't play":
 | A playlist is missing from the switcher | Its folder has no audio in it. The importer skips empty folders and says so. |
 | Rows appear, pressing play shows "This track could not be loaded." | A 404 — the file named in the manifest isn't in `public/audio`. Renaming a file means re-running the importer. |
 | Nothing happens on first load, works after a click | Expected. Browsers block audio that isn't tied to a user gesture; every control here starts from a click. |
-| Player works locally, 404s on the deployed site | The audio wasn't in the build. Re-run `npm run build` — `public/` is copied into `dist/`, and anything added after a build is missing. |
+| Player works locally, 404s on the deployed site | The audio is git-ignored, so the Pages build has none of it. Set the `VITE_AUDIO_BASE` repository variable — see [Where the audio lives](#where-the-audio-lives). The tracklist still looks right in this case, because the manifest is committed; only playback fails. |
+| Tracks load but the console reports a CORS error | Only relevant if the code starts setting `crossOrigin` on the audio element. It doesn't, so a cross-origin bucket needs no CORS config — see [Where the audio lives](#where-the-audio-lives). |
+| Player works locally, 404s on a hand-uploaded `dist/` | The audio wasn't in the build. Re-run `npm run build` — `public/` is copied into `dist/`, and anything added after a build is missing. |
 | A track's time shows 0:00 until you press play | The duration is read from the file by the browser. It fills in on load. |
 
 ### Naming tracks
@@ -226,12 +232,96 @@ There is deliberately no `--title` or `--artist` flag. Those belong to a playlis
 rather than to an import run, and with more than one playlist a single flag could
 only ever name one of them, so they live in `src/data/playlist.js` instead.
 
+### Where the audio lives
+
+This is the one piece of setup that differs between your machine and the
+published site, and it is worth understanding before you change anything else.
+
+**The tracks are git-ignored.** `public/audio/*/*.mp3` and friends are excluded on
+purpose: they're recordings you have no right to redistribute, so they stay out
+of the repository. But that repo is also what the deploy builds from
+(`.github/workflows/deploy.yml` checks it out and runs `npm run build` on
+GitHub's servers), so **a build from the repo has no audio in it at all.**
+
+That failure is quiet, which is why it's worth stating plainly. The manifest
+*is* committed, so the deployed page still lists every playlist and every track
+with correct durations. It looks completely healthy. Nothing tells you the audio
+is missing until you press play and get "This track could not be loaded."
+
+So the audio is hosted separately, and `src/data/audio.js` points at it:
+
+| | Audio root | Resolves to |
+|---|---|---|
+| Local dev | same site | `/audio/mood/Sial.mp3` — served out of `public/audio` |
+| Published | `VITE_AUDIO_BASE` | `https://your-audio-host/mood/Sial.mp3` |
+
+The manifest never decides this. It records each track as a path inside the audio
+root (`mood/Sial.mp3`) and stops there, so re-importing audio can't disturb where
+the site looks for it — the same reason titles moved out of the manifest.
+
+**To point a deploy at your audio host,** set one repository variable and
+redeploy:
+
+> Settings → Secrets and variables → Actions → **Variables** → New variable →
+> `VITE_AUDIO_BASE` = `https://your-audio-host`
+
+It's a variable rather than a secret because a public URL needs no
+encrypting. The workflow passes it to the build, so future deploys need no code
+change. The host has to serve `public/audio`'s layout — the `mood/` and `galau/`
+subfolders — so uploading the contents of `public/audio/` to it does it directly.
+
+Two ways to expose the bucket, both free:
+
+- **`r2.dev` subdomain** — one toggle, live in a minute. Cloudflare describes it
+  as development-only and applies a variable throttle (hundreds of requests per
+  second, and bandwidth throttling too). Fine for a personal site with a handful
+  of listeners; not something to depend on.
+- **Custom domain** (`audio.kacanggsoyaa.ovh`) — production-appropriate, no
+  throttle, and it gets Cloudflare's CDN caching. Requires adding the domain to
+  Cloudflare as a zone first; the *partial (CNAME)* setup does this for the one
+  subdomain and leaves your existing OVH DNS for the main site untouched.
+
+**The free tier covers this comfortably.** 10 GB of storage is roughly 1,700
+tracks at the current ~5.6 MB encodes, 10 million reads a month is about 300
+plays a day, and egress — the billable thing on every other host — is free.
+The one thing to know: R2 asks for a payment method when you create the account.
+Nothing is charged while you stay inside those numbers, but set a billing alert
+so an overrun is visible rather than surprising.
+
+Unset, the build falls back to serving audio from the site itself. That's right
+for local work and wrong for GitHub Pages, which is why the workflow comments
+say so.
+
+**Getting the layout right in the bucket.** `VITE_AUDIO_BASE` is the bucket's
+root URL, and the manifest appends `mood/Sial.mp3` to it — so the playlist
+folders need to sit at the *top level* of the bucket, not inside another
+folder. Upload the contents of `public/audio/`, so the bucket looks like:
+
+```
+mood/James Arthur - Car's Outside.mp3
+galau/Mahalini - Sial.mp3
+```
+
+`dist/audio/` has the same layout if you've built recently, but `public/audio/`
+is the canonical copy — `dist/` is a build artifact. Upload the folders, not
+`public/audio` itself, or every track 404s on a stray path segment. The
+`.txt` notes in a playlist folder are optional to upload; nothing references
+them.
+
+**CORS is not needed.** The player sets no `crossOrigin` attribute, so the
+browser requests the audio in no-cors mode and plays it without any
+`Access-Control-Allow-Origin` header. That's why an R2 bucket works here with no
+CORS configuration at all. It would only matter if the code ever needed to read
+the audio bytes — the Web Audio API, or drawing it to a canvas — which it
+doesn't.
+
 ### Keeping the deploy small
 
-Everything in `public/audio` is copied into `dist/` and re-uploaded on every
-deploy, and full-length tracks are big. The two full-length tracks currently in
-the repo are ~11 MB; a 14-song set of 5 MB encodes would be ~76 MB, which is most
-of your site.
+Audio is no longer part of `dist/` on a Pages build, so it doesn't bloat the site
+or the repo — but it is still re-uploaded to the audio host on every change, and
+bandwidth is what costs money there. Full-length tracks are big: the two
+currently in `public/audio` are ~11 MB, and at ~192 kbps a 100-track library is
+~570 MB.
 
 `--no-encode` never shrinks anything, so to actually reduce the weight, re-encode
 from a copy kept **outside** the project:
@@ -333,10 +423,11 @@ Keeping this separate from the manifest is the point — the importer rewrites
 - Any change to `public/audio` — adding, renaming, deleting — needs a fresh import
   to reach the player. The manifest holds the filenames, so a rename without a
   re-import is a 404.
-- **The audio is git-ignored.** `public/audio/*/*.mp3` and friends are excluded on
-  purpose: these are recordings you have no right to redistribute, so they stay
-  out of the repository and out of any deploy made from it. Build locally with
-  `npm run build` and upload `dist/`, which does contain the audio.
+- **The audio is git-ignored**, so a deploy built from the repo has no audio in
+  it — the site is pointed at a separate audio host instead. See
+  [Where the audio lives](#where-the-audio-lives); that's the first thing to
+  check if every track fails to load on the published site while working
+  perfectly on localhost.
 
 ## Notes
 

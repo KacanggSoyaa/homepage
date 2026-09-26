@@ -1,12 +1,15 @@
-This folder is a playlist.
+Playlist folder.
 
-Anything you drop in here is ignored until you run the importer:
+The name of this folder is the playlist's id, and the id is the last part of its
+URL -- this folder is /music/galau. Rename it to whatever you want the playlist
+called; letters, numbers and dashes are what you get, so "Late Night" would
+become "late-night".
+
+To add a song, drop the audio in here and run:
 
     node scripts/import-audio.mjs
 
-The folder name is the playlist's id, and it is the last part of its URL —
-this folder is /music/focus — so rename it to whatever you want the playlist
-called. Use letters, numbers and dashes; "Late Night" becomes "late-night".
-
-The playlist's title, artist and licence are set in src/data/playlist.js
-under the same id, and survive every future import.
+Until you give the playlist a title of its own it is shown by this folder's name
+read as words, so this one is "Galau". Titles, artists and licences are set in
+src/data/playlist.js under the same id, and the importer never writes to that
+file, so a title you choose survives every future import.

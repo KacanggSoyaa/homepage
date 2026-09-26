@@ -417,14 +417,19 @@ for (const folder of folders) {
 // The project is single-quoted throughout, so the generated file should be too.
 const js = (value) => `'${String(value).replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`
 
+// Deliberately no URL logic here. A track is written as a path within the audio
+// root ("mood/Sial.mp3") and nothing more, so the same manifest works whether
+// the audio is served from this site or from a separate host. Turning those
+// paths into URLs is src/data/audio.js's job, and it is hand-maintained for the
+// same reason titles are: re-importing audio must never disturb how the site
+// finds it.
 const body = `// GENERATED FILE — do not edit by hand.
 //
 // Written by scripts/import-audio.mjs. Re-run the importer to change the audio.
-// Titles, artists and licences are hand-maintained in src/data/playlist.js,
-// keyed by these playlist ids.
-
-const BASE = import.meta.env.BASE_URL || '/'
-const audioPath = (file) => \`\${BASE.endsWith('/') ? BASE : \`\${BASE}/\`}audio/\${file}\`
+//
+// 'file' is a path within the audio root, not a URL. src/data/audio.js decides
+// where that root lives. Titles, artists and licences are hand-maintained in
+// src/data/playlist.js, keyed by these playlist ids.
 
 export const library = {
   playlists: [
@@ -436,9 +441,9 @@ ${playlists
 ${playlist.tracks
   .map(
     (track) =>
-      `        { id: ${track.id}, title: ${js(track.title)}, src: audioPath(${js(
+      `        { id: ${track.id}, title: ${js(track.title)}, file: ${js(
         track.file,
-      )}), duration: ${track.duration}, art: ${track.art} },`,
+      )}, duration: ${track.duration}, art: ${track.art} },`,
   )
   .join('\n')}
       ],

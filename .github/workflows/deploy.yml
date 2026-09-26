@@ -24,6 +24,18 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+        env:
+          # Where the music is hosted, since the tracks are git-ignored and so
+          # are not in this checkout. Set once as a repository variable
+          # (Settings > Secrets and variables > Actions > Variables >
+          # VITE_AUDIO_BASE) and redeploys pick it up from there. It is a plain
+          # public URL, so a variable rather than a secret.
+          #
+          # Unset, the build falls back to serving the audio from the site
+          # itself — which works locally but 404s every track on GitHub Pages,
+          # because the MP3s are not in the repository. The player still lists
+          # them, so it fails only on play.
+          VITE_AUDIO_BASE: ${{ vars.VITE_AUDIO_BASE }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
