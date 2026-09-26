@@ -19,8 +19,16 @@
 
 import { audioUrl } from './audio.js'
 import { library } from './audio-manifest.js'
+import bodyProfile from '../components/img/bodyProfile.jpg'
 
 const UNKNOWN = 'Unknown artist'
+
+// One photograph stands in for the artwork of every track in the library. It is
+// imported rather than referenced by path so the bundler fingerprints and
+// serves it from the site's own assets, and so a typo fails the build instead of
+// a broken image. Set `cover: null` on a playlist to fall back to the generated
+// planet art in TrackArt.
+const COVER = bodyProfile
 
 export const playlistMeta = {
   mood: {
@@ -59,9 +67,11 @@ export const playlists = library.playlists.map((generated) => {
     license: meta.license || null,
     licenseUrl: meta.licenseUrl || null,
     source: meta.source || null,
-    // Track artists come from the playlist, since the importer reads filenames
-    // and not ID3 tags. Spreading `artist` onto each track keeps every consumer
-    // — the tracklist rows, the dock, the media session — reading one field.
+    // Track artists come from the manifest, where the importer split them off the
+    // "Artist - Song" filename. A file that does not name an artist has none
+    // stored, and falls back to the playlist's own. Spreading `artist` onto each
+    // track keeps every consumer — the tracklist rows, the dock, the media
+    // session — reading one field.
     //
     // 'file' is the path inside the audio root; 'src' is the URL the player
     // actually loads, which is the same path until audio.js is told the audio
@@ -72,6 +82,7 @@ export const playlists = library.playlists.map((generated) => {
       ...track,
       src: audioUrl(track.file),
       artist: track.artist || artist,
+      cover: meta.cover === undefined ? COVER : meta.cover,
     })),
   }
 })

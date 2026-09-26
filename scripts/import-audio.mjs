@@ -224,6 +224,24 @@ const titleOf = (file) =>
     .trim() || basename(file)
 
 /**
+ * Split a "Artist - Song" filename into its two halves.
+ *
+ * The library is named "Artist - Song", so the artist is recoverable without
+ * reading ID3 tags. It splits on the *first* dash, which keeps dashes that
+ * belong to the song: "New West - Those Eyes - Sped Up" is by New West.
+ *
+ * Both sides must be non-empty, so "18" or "- Intro" is left whole and simply
+ * has no artist — the track then falls back to the playlist's artist, which is
+ * the honest answer for a file that does not say who performed it.
+ */
+const splitName = (file) => {
+  const title = titleOf(file)
+  const match = /^(.+?)\s+[-\u2013\u2014]\s+(.+)$/.exec(title)
+  if (!match) return { title, artist: '' }
+  return { title: match[2].trim(), artist: match[1].trim() }
+}
+
+/**
  * The name the encoded file gets inside its playlist folder.
  *
  * Intentionally the source filename with only URL-unsafe characters removed —
@@ -400,9 +418,14 @@ for (const folder of folders) {
   // playlists can hold files of the same name without colliding.
   const tracks = files.map((file, i) => {
     bytes += statSync(file).size
+    // The manifest carries the artist alongside the title so the site does not
+    // have to re-derive it. 'artist' is omitted when the filename does not say,
+    // and src/data/playlist.js falls back to the playlist's own artist.
+    const named = splitName(file)
     return {
       id: i + 1,
-      title: titleOf(file),
+      title: named.title,
+      artist: named.artist,
       file: relative(AUDIO_DIR, file).split(sep).join('/'),
       duration: limit ?? durationOf(file),
       art: art++ % PALETTE_COUNT,
@@ -428,8 +451,10 @@ const body = `// GENERATED FILE — do not edit by hand.
 // Written by scripts/import-audio.mjs. Re-run the importer to change the audio.
 //
 // 'file' is a path within the audio root, not a URL. src/data/audio.js decides
-// where that root lives. Titles, artists and licences are hand-maintained in
-// src/data/playlist.js, keyed by these playlist ids.
+// where that root lives. 'artist' is the part of the filename before the first
+// " - ", omitted for a file that does not name one; a playlist's own title,
+// artist and licence wording is hand-maintained in src/data/playlist.js, keyed
+// by these playlist ids.
 
 export const library = {
   playlists: [
@@ -441,9 +466,9 @@ ${playlists
 ${playlist.tracks
   .map(
     (track) =>
-      `        { id: ${track.id}, title: ${js(track.title)}, file: ${js(
-        track.file,
-      )}, duration: ${track.duration}, art: ${track.art} },`,
+      `        { id: ${track.id}, title: ${js(track.title)},${
+        track.artist ? ` artist: ${js(track.artist)},` : ''
+      } file: ${js(track.file)}, duration: ${track.duration}, art: ${track.art} },`,
   )
   .join('\n')}
       ],
