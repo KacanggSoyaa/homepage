@@ -260,7 +260,7 @@ export default function Music() {
 
           <div
             ref={scrollerRef}
-            className="max-h-[43.75rem] sm:max-h-[22.375rem] overflow-y-auto overscroll-contain feed-scroll p-2"
+            className="max-h-[43.75rem] sm:max-h-[21.875rem] overflow-y-auto overscroll-contain feed-scroll p-2"
           >
             {/* Two columns from sm up; a single column of a dozen rows would
                 otherwise make for a very long, very empty scroll. */}
