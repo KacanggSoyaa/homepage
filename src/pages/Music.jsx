@@ -244,9 +244,11 @@ export default function Music() {
 
         {/* The list lives in a card with its own scrollbar, capped so about a
             dozen rows are on screen and the rest are reached by scrolling
-            inside the card rather than by pushing the page down. The cap
-            doubles at sm, where the grid gains a second column and the same
-            twelve tracks occupy half as many rows. */}
+            inside the card rather than by pushing the page down. The cap is
+            measured against the viewport so it stays a sensible height on a
+            short laptop screen as well as a tall one, and it shrinks at sm,
+            where the grid gains a second column and the same dozen tracks
+            occupy half as many rows. */}
         <div className="glass rounded-lg border border-ink-200/15 dark:border-paper-50/10 overflow-hidden">
           <div className="flex items-center gap-2 px-4 py-3 bg-ink-900/5 dark:bg-paper-50/5 border-b border-ink-200/10 dark:border-paper-50/10">
             <QueueIcon width="15" height="15" className="text-amber shrink-0" />
@@ -260,7 +262,7 @@ export default function Music() {
 
           <div
             ref={scrollerRef}
-            className="max-h-[43.75rem] sm:max-h-[21.875rem] overflow-y-auto overscroll-contain feed-scroll p-2"
+            className="max-h-[70vh] sm:max-h-[40vh] overflow-y-auto overscroll-contain feed-scroll p-2"
           >
             {/* Two columns from sm up; a single column of a dozen rows would
                 otherwise make for a very long, very empty scroll. */}
