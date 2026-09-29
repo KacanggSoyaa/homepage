@@ -14,16 +14,34 @@
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
     <script>
-      // GitHub Pages SPA redirect hack
-      (function(l) {
-        if (l.search[1] === '/') {
-          var decoded = l.search.slice(1).split('&').map(function(s) {
-            return s.replace(/~and~/g, '&')
-          }).join('?');
-          window.history.replaceState(null, null,
-            l.pathname.slice(0, -1) + decoded + l.hash
-          );
-        }
+      // GitHub Pages SPA redirect, decoding half. public/404.html sends an
+      // unknown path here as /?/<percent-encoded path>; this puts it back.
+      (function (l) {
+        // Only the root, and only the exact marker 404.html writes.
+        //
+        // The guard used to be `l.search[1] === '/'`, which tests the *second
+        // character of the raw query string* — so it matched any URL whose query
+        // began with `?/`, including a real page like /music/?/... On a refresh
+        // of an actual route that ran the decoder against a live URL and
+        // rewrote the pathname out from under the visitor. Pinning this to
+        // pathname === '/' means the decoder can only ever touch the redirect
+        // landing, which is the one place 404.html sends us.
+        if (l.pathname !== '/' || l.search.slice(0, 2) !== '?/') return
+
+        // Positional decode, once. The old version ran
+        // `search.slice(1).split('&').map(decode).join('?')`, which did two
+        // unrelated corruptions at once: it decoded `~and~` back into a raw
+        // `&` (a character the very next 404 bounce would re-escape, so each
+        // refresh grew the URL), and it rewrote `&` separators into `?`
+        // separators, mangling any multi-parameter query.
+        var parts = l.search.slice(2).split('&')
+        var path = decodeURIComponent(parts[0] || '')
+        var query = parts[1] ? '?' + decodeURIComponent(parts[1]) : ''
+
+        // replaceState, not a navigation: index.html is already running, and
+        // dropping the `?/` marker in the same step is what makes a refresh a
+        // clean no-op instead of another trip through the decoder.
+        window.history.replaceState(null, '', '/' + path + query + l.hash)
       }(window.location))
     </script>
   </body>
