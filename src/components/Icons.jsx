@@ -241,3 +241,21 @@ export const QueueIcon = (props) => (
   </svg>
 )
 
+// Chevron down — collapses the expanded now-playing sheet back into the dock,
+// default 18x18
+export const ChevronDownIcon = (props) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.8"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    width="18"
+    height="18"
+    {...props}
+  >
+    <path d="m5.5 9 6.5 6.5L18.5 9" />
+  </svg>
+)
+

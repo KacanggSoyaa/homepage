@@ -435,3 +435,51 @@
     background: rgba(232, 163, 61, 0.8);
   }
 }
+
+/* ============================================================
+   Now-playing sheet — the full-screen panel the dock expands
+   into when its track readout is clicked.
+
+   Two separate keyframes so the backdrop can fade in on its
+   own faster curve while the panel travels, which reads as the
+   panel being lifted toward the viewer rather than as the whole
+   page dimming and then jumping. `both` matters here: without
+   it the panel would sit at its un-animated position for one
+   frame before the animation started, and flash.
+   ============================================================ */
+@keyframes sheet-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes sheet-rise {
+  from {
+    opacity: 0;
+    transform: translateY(3rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@utility animate-sheet-fade {
+  animation: sheet-fade 0.2s ease-out both;
+}
+
+@utility animate-sheet-rise {
+  animation: sheet-rise 0.32s cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+/* Unlayered, so it outranks the utilities layer the two @utility rules above
+   compile into — the sheet then simply appears rather than sliding. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-sheet-fade,
+  .animate-sheet-rise {
+    animation: none;
+  }
+}

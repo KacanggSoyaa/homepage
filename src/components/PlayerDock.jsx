@@ -9,10 +9,17 @@
 // play/pause, next and repeat are always on screen rather than hidden behind an
 // expand toggle, because they are the reason to reach for a player in the
 // first place. A progress hairline runs along the top edge, full bleed.
+//
+// The track readout on the left is a button, not a label: it opens PlayerSheet,
+// the full-screen now-playing view. Only that readout is the trigger — the
+// transport, volume and queue controls sit outside it, so expanding the player
+// never sits between anyone and the button they meant to press.
 
+import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { formatTime, usePlayer } from '../player/PlayerContext.jsx'
 import TrackArt from './TrackArt.jsx'
+import PlayerSheet from './PlayerSheet.jsx'
 import { QueueIcon } from './Icons.jsx'
 import { Scrubber, Transport, VolumeControl } from './PlayerControls.jsx'
 
@@ -29,11 +36,20 @@ export default function PlayerDock() {
   const { playlist, tracks, track, isPlaying, loading, error, currentTime, duration, repeat, shuffle } =
     usePlayer()
 
+  // Whether the full-screen now-playing sheet is open. Plain component state
+  // rather than player state: it is a view of the engine, not a fact about
+  // playback, so it must not survive a reload or be remembered in prefs.
+  const [expanded, setExpanded] = useState(false)
+
+  // Handed to the sheet so dismissing it can put focus back on the button that
+  // opened it, rather than dropping keyboard users at the top of the document.
+  const triggerRef = useRef(null)
+
   // With no tracks there is nothing to show and nothing to control, so the bar
   // and the spacer that reserves its height are both dropped. Rendering it
   // anyway would mean a row of dead buttons and a track with no title, since
   // `track` is undefined for an empty library. Safe to return early: the only
-  // hook above is the context read.
+  // hooks above are the context read and this state.
   if (!tracks.length) return null
 
   return (
@@ -52,32 +68,52 @@ export default function PlayerDock() {
             <Scrubber variant="slim" className="w-full" />
 
             <div className="flex items-center gap-3 px-3 sm:px-4" style={{ height: BAR_H }}>
-              {/* Artwork for the loaded track, pulsing while it buffers.
-                  Hidden on phones: five transport buttons leave the title only
-                  a few characters there, and the art still reads on /music. */}
-              <div className="hidden sm:block shrink-0">
-  <TrackArt
-    art={track.art}
-    src={track.cover}
-    label={`Cover art for ${track.title}`}
-                  className={`w-10 h-10 ${loading && !isPlaying ? 'animate-pulse' : ''}`}
-                />
-              </div>
+              {/* Artwork and title together are the expand trigger, so they
+                  share one button. It is the only click target in the bar that
+                  opens the sheet — the transport, volume and queue controls all
+                  sit outside it.
 
-              {/* Title over artist. aria-live announces track changes without
-                  interrupting whatever the listener is doing. */}
-              <div className="min-w-0 flex-1">
-                <p aria-live="polite" className="font-mono text-sm font-medium truncate">
-                  {track.title}
-                </p>
-                <p className="font-mono text-[11px] text-ink-600 dark:text-paper-200/60 truncate">
-                  {error ? (
-                    <span className="text-amber">{error}</span>
-                  ) : (
-                    `${track.artist} · ${playlist.title}`
-                  )}
-                </p>
-              </div>
+                  The artwork is hidden on phones: five transport buttons leave
+                  the title only a few characters there, and the art still reads
+                  on /music. The button still works without it, since the title
+                  is what it is named by. */}
+              <button
+                ref={triggerRef}
+                type="button"
+                onClick={() => setExpanded(true)}
+                aria-expanded={expanded}
+                aria-haspopup="dialog"
+                className="flex items-center gap-3 min-w-0 flex-1 text-left rounded-md
+                           -ml-1 pl-1 pr-1 py-1 hover:bg-ink-900/5 dark:hover:bg-paper-50/5
+                           transition-colors"
+              >
+                <span className="hidden sm:block shrink-0">
+                  <TrackArt
+                    art={track.art}
+                    src={track.cover}
+                    label={`Cover art for ${track.title}`}
+                    className={`w-10 h-10 ${loading && !isPlaying ? 'animate-pulse' : ''}`}
+                  />
+                </span>
+
+                {/* Title over artist. aria-live announces track changes without
+                    interrupting whatever the listener is doing. The paragraphs
+                    become spans because a button's content model is phrasing
+                    content only, and each is pulled up to block by its own
+                    class rather than by a wrapper. */}
+                <span className="min-w-0 flex-1">
+                  <span aria-live="polite" className="block font-mono text-sm font-medium truncate">
+                    {track.title}
+                  </span>
+                  <span className="block font-mono text-[11px] text-ink-600 dark:text-paper-200/60 truncate">
+                    {error ? (
+                      <span className="text-amber">{error}</span>
+                    ) : (
+                      `${track.artist} · ${playlist.title}`
+                    )}
+                  </span>
+                </span>
+              </button>
 
               <Transport size="sm" />
 
@@ -109,6 +145,15 @@ export default function PlayerDock() {
           </div>
         </div>
       </div>
+
+      {/* Full-screen now-playing view, mounted only while open.
+
+          Deliberately a sibling of the bar's fixed wrapper rather than a child of
+          it: that wrapper carries z-40, which makes it a stacking context, so a
+          z-60 child would still be painted underneath the z-50 navbar. As a
+          sibling it competes in the root context and covers everything,
+          including the bar it was opened from. */}
+      {expanded && <PlayerSheet onClose={() => setExpanded(false)} openerRef={triggerRef} />}
     </>
   )
 }

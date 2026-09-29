@@ -72,9 +72,18 @@ export default function Music() {
     switchPlaylist(requested.id, { play: false })
   }, [requested, activeId, isPlaying, switchPlaylist])
 
-  // The card scrolls internally, so the row that is playing has to be brought
-  // back into view as the playlist advances. Scrolling the container directly
-  // (rather than node.scrollIntoView) keeps the page itself from jumping.
+  // From sm up the card scrolls internally, so the row that is playing has to be
+  // brought back into view as the playlist advances. Scrolling the container
+  // directly (rather than node.scrollIntoView) keeps the page itself from
+  // jumping — scrollIntoView would walk every scrollable ancestor, and the
+  // tracklist is nested inside the page.
+  //
+  // Below sm the card does not scroll, so the two branches below both read as
+  // no-ops and the page is left where the reader put it. That is deliberate:
+  // row 60 of a 126-track list is usually far off screen, and yanking the page
+  // down to it every time a track ends would be worse than the highlight being
+  // missed. The fixed dock carries the current track instead, and says so out
+  // loud via aria-live.
   const scrollerRef = useRef(null)
   const rowRefs = useRef(new Map())
 
@@ -242,13 +251,22 @@ export default function Music() {
           )}
         </div>
 
-        {/* The list lives in a card with its own scrollbar, capped so about a
-            dozen rows are on screen and the rest are reached by scrolling
-            inside the card rather than by pushing the page down. The cap is
-            measured against the viewport so it stays a sensible height on a
-            short laptop screen as well as a tall one, and it shrinks at sm,
-            where the grid gains a second column and the same dozen tracks
-            occupy half as many rows. */}
+        {/* The list lives in a card, and from sm up that card scrolls internally:
+            capped so about a dozen rows are on screen and the rest are reached
+            by scrolling inside the card rather than by pushing the page down.
+            The cap is measured against the viewport so it stays a sensible
+            height on a short laptop screen as well as a tall one, and it is
+            measured in dvh rather than vh so the bottom of the list is never
+            parked behind a mobile browser's toolbar.
+
+            Below sm there is no cap and no inner scroll, deliberately. A capped
+            scroll region on a phone is a scroll island: the finger lands inside
+            the card, overscroll-contain stops the page behind it from moving,
+            and scrolling past a 126-track list takes two separate gestures. It
+            is also 70% of a short screen, so the card never fits alongside the
+            player above it. Letting the list flow with the page removes both
+            problems and is what a single-column list wants anyway; the internal
+            scroll stays where it earns its keep, on the two-column grid. */}
         <div className="glass rounded-lg border border-ink-200/15 dark:border-paper-50/10 overflow-hidden">
           <div className="flex items-center gap-2 px-4 py-3 bg-ink-900/5 dark:bg-paper-50/5 border-b border-ink-200/10 dark:border-paper-50/10">
             <QueueIcon width="15" height="15" className="text-amber shrink-0" />
@@ -262,7 +280,7 @@ export default function Music() {
 
           <div
             ref={scrollerRef}
-            className="max-h-[70vh] sm:max-h-[40vh] overflow-y-auto overscroll-contain feed-scroll p-2"
+            className="p-2 sm:max-h-[40dvh] sm:overflow-y-auto sm:overscroll-contain sm:feed-scroll"
           >
             {/* Two columns from sm up; a single column of a dozen rows would
                 otherwise make for a very long, very empty scroll. */}
@@ -301,8 +319,19 @@ export default function Music() {
                       </span>
 
                       <span className="min-w-0 flex-1">
+                        {/* Titles run to 60 characters, which is two lines on a
+                            phone and one truncated line from sm up. clamp rather
+                            than truncate at both ends: the card is full width on
+                            a single column, so wrapping uses space that is
+                            already there instead of clipping the title.
+
+                            No `block` here on purpose. line-clamp-2 supplies its
+                            own block-level display (-webkit-box) and that is
+                            what -webkit-line-clamp needs; adding `block` back
+                            would be emitted later in the sheet and win, leaving
+                            the clamp inert. */}
                         <span
-                          className={`block font-mono text-sm truncate transition-colors ${
+                          className={`font-mono text-sm line-clamp-2 sm:line-clamp-1 transition-colors ${
                             isCurrent
                               ? 'text-amber'
                               : 'text-ink-900 dark:text-paper-50 group-hover:text-amber'
