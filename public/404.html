@@ -3,14 +3,28 @@
   <head>
     <meta charset="utf-8">
     <script>
-      // Redirect to index.html preserving the path for React Router
-      var pathSegmentsToKeep = 1;
+      // GitHub Pages has no rewrite rule, so an unknown path is served this
+      // file. Hand the path to the SPA as a percent-encoded query value on the
+      // root, where index.html picks it up and restores the real URL.
+      //
+      // percent-encoding, not a hand-rolled `&` -> `~and~`, is what makes the
+      // round trip stable. That old scheme re-escaped `&` on every bounce, so a
+      // URL like /music/?/&/~and~/~and~/~and~/~and~/ came back with one more
+      // ~and~ appended every refresh and grew without bound. encodeURIComponent
+      // and decodeURIComponent are exact inverses, so any number of round trips
+      // returns the same URL.
       var l = window.location;
+      // The whole path goes in the query, not just the part after the first
+      // segment. The old version kept segment one in the pathname and put only
+      // the remainder in the query, which forced index.html to glue the two
+      // back together with pathname.slice(0, -1) — and that slice is what ate
+      // the trailing character of any real path. Sending the complete path
+      // means index.html only has to prepend a slash.
+      var path = l.pathname.split('/').filter(Boolean).join('/');
+      var query = l.search ? l.search.slice(1) : '';
       l.replace(
-        l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
-        l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?/' +
-        l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
-        (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+        l.origin + '/?/' + encodeURIComponent(path) +
+        (query ? '&' + encodeURIComponent(query) : '') +
         l.hash
       );
     </script>
