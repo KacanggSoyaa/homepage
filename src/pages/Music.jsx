@@ -10,11 +10,12 @@
 // *is* the player — a tracklist for one playlist above a now-playing panel for
 // another would be a lie about what the transport buttons do.
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { usePlayer, formatTime } from '../player/PlayerContext.jsx'
 import TrackArt from '../components/TrackArt.jsx'
 import PlaylistSwitcher from '../components/PlaylistSwitcher.jsx'
+import TrackSearch from '../components/TrackSearch.jsx'
 import ScrollReveal from '../components/ScrollReveal.jsx'
 import { ExternalLinkIcon, QueueIcon } from '../components/Icons.jsx'
 import { NowPlayingBars, Scrubber, Transport } from '../components/PlayerControls.jsx'
@@ -24,6 +25,20 @@ const REPEAT_WORDS = {
   all: 'repeats the playlist',
   one: 'repeats this track',
 }
+
+// Below this many tracks a filter is clutter: there is nothing to search a list
+// of five songs for, and an empty search box on screen invites a tap that cannot
+// do anything. The tracklist itself still shows every row.
+const SEARCH_MIN = 8
+
+// Accents stripped and case lowered, so a search is spelling rather than
+// keyboard: "cafe" finds "Café" and "bjork" finds "Björk". Track titles in this
+// library carry accents, and nobody types them on purpose.
+const fold = (value) =>
+  value
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
 
 export default function Music() {
   const { id } = useParams()
@@ -53,6 +68,43 @@ export default function Music() {
   // Until the engine has caught up with the URL, `index` refers to the previously
   // loaded playlist, so the highlighted row is only meaningful when they agree.
   const isLoaded = shown?.id === activeId
+
+  // The filter, held as the playlist id it was typed against as well as the text.
+  // A query belongs to the list it was typed for: switching playlists drops it
+  // rather than silently applying a term meant for another library to the new
+  // one. Correcting that during render — the same way `shown` is settled above —
+  // means there is no frame in which the new tracklist appears already filtered.
+  const [search, setSearch] = useState({ playlistId: shown?.id ?? null, text: '' })
+  const query = search.playlistId === (shown?.id ?? null) ? search.text : ''
+  const setQuery = (text) => setSearch({ playlistId: shown?.id ?? null, text })
+
+  // Whitespace-separated words, so "afgan jodoh" narrows on both at once rather
+  // than looking for that exact string in that exact order. Every word has to
+  // match, against either the title or the artist.
+  const terms = useMemo(
+    () => fold(query).split(/\s+/).filter(Boolean),
+    [query],
+  )
+
+  // "title artist" per track, folded once per playlist rather than once per
+  // keystroke — a 126-track list would otherwise re-normalise every title on the
+  // page with each character typed.
+  const haystacks = useMemo(
+    () => tracks.map((entry) => `${fold(entry.title)} ${fold(entry.artist)}`),
+    [tracks],
+  )
+
+  // The rows on screen, each paired with the position it holds in the *full*
+  // playlist. Playback is addressed by index, so a filtered list has to remember
+  // where a track actually sits: tapping the first row on screen must play that
+  // track, not whatever sits at position 0 behind the filter.
+  const rows = useMemo(
+    () =>
+      tracks
+        .map((entry, position) => ({ entry, position }))
+        .filter(({ position }) => terms.every((term) => haystacks[position].includes(term))),
+    [tracks, terms, haystacks],
+  )
 
   // Browsing to another playlist must never interrupt what is playing. The URL
   // decides which tracklist is on screen; the player keeps whatever it has
@@ -93,6 +145,10 @@ export default function Music() {
     // sense while the list on screen is the loaded one. Browsing to another
     // playlist must not yank its list to an unrelated row.
     if (!isLoaded) return
+    // Rows are keyed by their position in the full playlist, so a filtered list
+    // still resolves this — and a track the filter has hidden resolves to
+    // nothing, which reads correctly as "leave the list where the reader left
+    // it" rather than scrolling to a row that is not on screen.
     const row = rowRefs.current.get(index)
     if (!scroller || !row) return
     const box = scroller.getBoundingClientRect()
@@ -101,6 +157,16 @@ export default function Music() {
     if (line.top < box.top + inset) scroller.scrollTop -= box.top + inset - line.top
     else if (line.bottom > box.bottom - inset) scroller.scrollTop += line.bottom - box.bottom + inset
   }, [index, isLoaded])
+
+  // Switching playlists swaps the rows but not the container, so the inner
+  // scroll would survive into a list it has nothing to do with — leaving the new
+  // playlist open at whatever row the old one happened to end on. Start it at its
+  // own first row instead. Kept out of the effect above because that one follows
+  // the playing track, which says nothing about which playlist is on screen.
+  useEffect(() => {
+    const scroller = scrollerRef.current
+    if (scroller) scroller.scrollTop = 0
+  }, [shown?.id])
 
   return (
     <section className="container-page py-16 sm:py-20">
@@ -116,10 +182,6 @@ export default function Music() {
           is meant to be played.
         </p>
       </ScrollReveal>
-
-      {/* Playlist picker. Renders nothing until there is a second playlist to
-          pick between, so a one-playlist library shows no chrome at all. */}
-      <PlaylistSwitcher className="mt-8" viewingId={shown?.id} />
 
       {/* An empty library is a valid state, not an error: the importer can
           write a manifest with no playlists, and there is no audio for the
@@ -273,10 +335,40 @@ export default function Music() {
             <span className="font-mono text-xs text-ink-600 dark:text-paper-200/60 truncate">
               {shown.title.toLowerCase()}.m3u
             </span>
-            <span className="ml-auto font-mono text-[11px] text-ink-600 dark:text-paper-200/50 shrink-0">
-              {tracks.length} tracks
+            {/* How many rows are actually below this header, which stops being
+                the playlist length the moment a filter is in play. role=status
+                so the count is announced as it changes — for a screen reader the
+                rows themselves are the only other sign that the list moved. */}
+            <span
+              role="status"
+              className="ml-auto font-mono text-[11px] text-ink-600 dark:text-paper-200/50 shrink-0"
+            >
+              {terms.length ? `${rows.length} of ${tracks.length}` : `${tracks.length} tracks`}
             </span>
           </div>
+
+          {/* The playlist picker, inside the card whose rows it decides. It
+              renders nothing until there is a second playlist to pick between,
+              so a one-playlist library shows no chrome at all — which is also
+              why the row's own border and padding are passed to it as its
+              className, rather than wrapped in a div that would be left behind
+              as an empty divider.
+
+              The highlight follows the playlist on screen rather than the one
+              loaded in the player, so browsing here never claims that the
+              transport buttons are about to act on a list they are not. */}
+          <PlaylistSwitcher
+            className="px-4 py-3 border-b border-ink-200/10 dark:border-paper-50/10"
+            viewingId={shown?.id}
+          />
+
+          {/* The filter, inside the card it filters and above the scroll region,
+              so it stays put while the rows move underneath it. */}
+          {tracks.length >= SEARCH_MIN && (
+            <div className="px-3 py-3 border-b border-ink-200/10 dark:border-paper-50/10">
+              <TrackSearch value={query} onChange={setQuery} />
+            </div>
+          )}
 
           <div
             ref={scrollerRef}
@@ -285,9 +377,12 @@ export default function Music() {
             {/* Two columns from sm up; a single column of a dozen rows would
                 otherwise make for a very long, very empty scroll. */}
             <ul className="grid sm:grid-cols-2 gap-x-8 gap-y-0.5">
-              {tracks.map((entry, position) => {
+              {rows.map(({ entry, position }) => {
                 // Gated on the engine having caught up with the URL, so the
                 // highlight never lands on row 2 of a list it isn't playing yet.
+                // Note it is `position`, not the row's place in the filtered
+                // view, so a track stays highlighted at its real track number
+                // while a filter is narrowing the list around it.
                 const isCurrent = isLoaded && position === index
                 return (
                   <li key={entry.id}>
@@ -353,6 +448,16 @@ export default function Music() {
                 )
               })}
             </ul>
+
+            {/* No rows left is not the same thing as an empty playlist: the
+                playlist is there, the filter is what ruled all of it out, so it
+                says which term did the ruling and where to undo it. */}
+            {rows.length === 0 && (
+              <p className="px-3 py-8 text-center font-mono text-xs text-ink-600 dark:text-paper-200/60">
+                no track in {shown.title} matches{' '}
+                <span className="text-amber">'{query.trim()}'</span>
+              </p>
+            )}
           </div>
         </div>
       </ScrollReveal>
