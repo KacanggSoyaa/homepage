@@ -2,7 +2,7 @@
 // Renders the site chrome (Navbar + Footer) around the routed page content.
 // It owns the dark/light theme state and smooth-scroll behavior for anchors.
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom'
 import Navbar from './components/Navbar.jsx'
 import Footer from './components/Footer.jsx'
@@ -12,6 +12,11 @@ import { PlayerProvider } from './player/PlayerContext.jsx'
 import About from './pages/About.jsx'
 import Music from './pages/Music.jsx'
 import Thread from './pages/Thread.jsx'
+
+// Which page of the site a path belongs to: "" for the home page, "about" for
+// /about, and "music" for both /music and /music/galau — the trailing segment of
+// a path names what is shown on a page, not the page itself.
+const pageOf = (pathname) => pathname.split('/')[1] || ''
 
 // App is the root component. It receives the `sections` array from main.jsx
 // and renders them on the "/" route. About stays on its own "/about" route.
@@ -41,15 +46,33 @@ export default function App({ sections }) {
 
   // On navigation: if the URL contains a hash (e.g. /about#threads), smooth-scroll
   // to that element once the page has rendered, so deep links like the "back to
-  // threads" button land in the right spot. Without a hash, scroll back to top.
+  // threads" button land in the right spot. Without a hash, scroll back to top —
+  // but only when a different page of the site was opened.
+  //
+  // Comparing paths is not enough to tell that, because a path can change while
+  // the page on screen does not: /music/mood and /music/focus render the same
+  // Music component with a different tracklist, and both are paths that differ
+  // from each other. Sending those to the top threw the reader back to the
+  // heading on every playlist switch, which is worst exactly where it matters —
+  // the picker that performs that navigation sits well down the page, so it took
+  // the scroll position with it.
+  const previousPage = useRef(pageOf(location.pathname))
   useEffect(() => {
+    const page = pageOf(location.pathname)
+    const pageChanged = previousPage.current !== page
+    previousPage.current = page
+
+    // A hash is always a request to land on an element, including on the page
+    // already open — that is what an in-page anchor link is.
     const hash = window.location.hash
     if (hash) {
       const el = document.getElementById(hash.slice(1))
       if (el) el.scrollIntoView({ behavior: 'smooth' })
-    } else {
-      window.scrollTo({ top: 0 })
+      return
     }
+
+    if (!pageChanged) return
+    window.scrollTo({ top: 0 })
   }, [location])
 
   // Flip between dark and light themes (used by the navbar toggle).

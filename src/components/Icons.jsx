@@ -259,3 +259,38 @@ export const ChevronDownIcon = (props) => (
   </svg>
 )
 
+// Search — magnifier on the tracklist filter, default 18x18
+export const SearchIcon = (props) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.8"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    width="18"
+    height="18"
+    {...props}
+  >
+    <circle cx="11" cy="11" r="6.5" />
+    <path d="m15.8 15.8 4.7 4.7" />
+  </svg>
+)
+
+// Close — an x, for clearing the tracklist filter, default 18x18
+export const CloseIcon = (props) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.8"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    width="18"
+    height="18"
+    {...props}
+  >
+    <path d="m6.5 6.5 11 11M17.5 6.5l-11 11" />
+  </svg>
+)
+
