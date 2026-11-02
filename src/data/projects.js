@@ -58,4 +58,22 @@ export const projects = [
     github: 'https://github.com/KacanggSoyaa/xsoya-music.git',
     demo: '',
   },
+  {
+    id: 7,
+    title: 'automate-procurement',
+    description:
+      'A project that I worked on to automate the procurement process. This project is a simple automation tool that helps streamline the procurement workflow.',
+    stack: ['Python', 'Typescript'],
+    github: 'https://github.com/KacanggSoyaa/automate-procurement.git',
+    demo: '',
+  },
+  {
+    id: 8,
+    title: 'Portfolio',
+    description:
+      'A personal portfolio website to showcase my skills, projects, and experience as a software developer. This project is a simple portfolio website that helps me to present my work in a professional manner.',
+    stack: ['Typescript', 'Astro'],
+    github: 'https://github.com/KacanggSoyaa/portfolio.git',
+    demo: '',
+  },
 ]
